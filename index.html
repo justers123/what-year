@@ -705,29 +705,11 @@
       return all;
     }
 
-    async function getFunFact(n) {
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 2500);
-        const res = await fetch(`https://numbersapi.com/${n}/trivia?json&notfound=floor`, {
-          signal: ctrl.signal
-        });
-        clearTimeout(t);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.text) return data.text;
-        }
-      } catch (e) {
-        /* fall through */
-      }
-      // Fallback facts when Numbers API is unreachable (it's HTTP-only or blocked as mixed content in most browsers).
-      if (n === 0) return "Zero! A perfect game — every guess spot on. Nearly impossible. Are you a time traveller?";
-      if (n < 10) return `${n} years is less than a standard mortgage term. Razor-sharp guessing.`;
-      if (n < 30) return `${n} years is roughly one human generation.`;
-      if (n < 50) return `${n} years ago the World Wide Web was only just being invented.`;
-      if (n < 100) return `${n} years is about the average human lifespan.`;
-      if (n < 200) return `${n} years ago Queen Victoria was on the throne.`;
-      return `${n} years is a very long time — longer than the United States has had electric light bulbs in homes.`;
+    function getFunFact(n) {
+      if (n === 0) return "Zero years, zero seconds — a perfect game. Are you a time traveller?";
+      const seconds = Math.round(n * 365.25 * 24 * 60 * 60);
+      const yearLabel = n === 1 ? 'year' : 'years';
+      return `${n} ${yearLabel} is about ${seconds.toLocaleString()} seconds.`;
     }
 
     // ---- game state ----
@@ -818,12 +800,10 @@
       }
     }
 
-    async function showEnd() {
+    function showEnd() {
       show('#end-screen');
       $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
-      $('#fun-fact-text').textContent = 'Loading...';
-      const fact = await getFunFact(state.totalOff);
-      $('#fun-fact-text').textContent = fact;
+      $('#fun-fact-text').textContent = getFunFact(state.totalOff);
     }
 
     async function startGame() {
