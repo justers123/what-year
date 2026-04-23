@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="googlebot" content="noindex, nofollow" />
+  <title>What Year?</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --bg-2: #181c33;
+      --fg: #f4f4f8;
+      --muted: #9aa0b4;
+      --accent: #ffcb47;
+      --accent-2: #ff7ac6;
+      --good: #5fd39d;
+      --bad: #ff6b6b;
+      --card: #1d2140;
+      --card-border: #2b3058;
+      --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(255, 122, 198, 0.15), transparent 60%),
+        radial-gradient(1000px 700px at 110% 10%, rgba(255, 203, 71, 0.12), transparent 60%),
+        var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 560px;
+      animation: fade 0.3s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tagline { color: var(--muted); font-size: 1.1rem; margin: 0 0 28px; line-height: 1.5; }
+    .muted { color: var(--muted); }
+
+    .btn-primary {
+      appearance: none;
+      border: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #1a1330;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 26px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+      box-shadow: 0 6px 20px rgba(255, 122, 198, 0.25);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px rgba(255, 122, 198, 0.35); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading-screen, #end-screen, #start-screen { text-align: center; }
+
+    /* question */
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    #q-image-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--bg-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    #q-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #q-image-wrap.no-image #q-image { display: none; }
+    .image-fallback {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255, 122, 198, 0.12), rgba(255, 203, 71, 0.12));
+    }
+    #q-image-wrap.no-image .image-fallback { display: flex; }
+    .image-fallback svg {
+      width: 45%;
+      height: 45%;
+      opacity: 0.55;
+      color: var(--accent);
+    }
+
+    .q-body { padding: 20px 22px 22px; }
+    #q-prompt {
+      margin: 0 0 6px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    #q-title {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+    #q-subtitle { margin: 0; font-size: 0.95rem; }
+
+    .year-input {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .year-input label {
+      display: block;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    #year-value {
+      color: var(--fg);
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-left: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      border: 3px solid var(--accent);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: grab;
+      border: 3px solid var(--accent);
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 6px;
+      margin-bottom: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #submit-btn { width: 100%; }
+
+    .reveal {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      animation: fade 0.3s ease;
+    }
+    .reveal.hidden { display: none; }
+    .reveal-answer { font-size: 1.1rem; margin: 0 0 6px; }
+    .reveal-answer strong { color: var(--accent); font-size: 1.6rem; }
+    .reveal-diff { margin: 0 0 18px; color: var(--muted); }
+    .reveal-diff strong { color: var(--fg); font-size: 1.3rem; }
+    #next-btn { width: 100%; }
+
+    /* celebration / reaction */
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      opacity: 0;
+      border-radius: 2px;
+      animation: confetti-fall 2s ease-out forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translate(0, -20px) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--drift, 0px), 110vh) rotate(720deg); opacity: 1; }
+    }
+
+    .reaction-pop {
+      position: fixed;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(2.4rem, 10vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+      text-align: center;
+      white-space: nowrap;
+      filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.5));
+      animation: reaction-pop 1.6s ease-out forwards;
+    }
+    @keyframes reaction-pop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); }
+      20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); }
+      40%  { transform: translate(-50%, -50%) scale(0.95) rotate(-2deg); }
+      70%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -58%) scale(1) rotate(0deg); }
+    }
+
+    /* end */
+    #end-screen .total {
+      font-size: 1.2rem;
+      margin: 0 0 6px;
+    }
+    #end-screen .total strong {
+      font-size: 2.4rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: block;
+      margin: 8px 0;
+    }
+    .fun-fact {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin: 20px 0 24px;
+      font-size: 1rem;
+      line-height: 1.5;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+    .fun-fact .label {
+      display: block;
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .error {
+      color: var(--bad);
+      background: rgba(255, 107, 107, 0.08);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2.25rem; }
+      #q-title { font-size: 1.15rem; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app">
+    <section id="start-screen" class="screen active">
+      <h1>What Year?</h1>
+      <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
+      <button id="start-btn" class="btn-primary">Start game</button>
+    </section>
+
+    <section id="loading-screen" class="screen">
+      <div class="spinner"></div>
+      <p class="muted">Loading questions from the web...</p>
+    </section>
+
+    <section id="question-screen" class="screen">
+      <div class="q-header">
+        <span id="q-counter">Question 1 of 10</span>
+        <span id="q-score">Total off: 0 years</span>
+      </div>
+
+      <div class="q-card">
+        <div id="q-image-wrap" class="no-image">
+          <img id="q-image" alt="" />
+          <div class="image-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="q-body">
+          <p id="q-prompt"></p>
+          <h2 id="q-title"></h2>
+          <p id="q-subtitle" class="muted"></p>
+        </div>
+      </div>
+
+      <div id="guess-panel" class="year-input">
+        <label for="year-slider">Your guess: <span id="year-value">1980</span></label>
+        <input type="range" id="year-slider" min="1900" max="2026" value="1980" />
+        <div class="range-labels">
+          <span>1900</span>
+          <span>2026</span>
+        </div>
+        <button id="submit-btn" class="btn-primary">Submit</button>
+      </div>
+
+      <div id="reveal" class="reveal hidden">
+        <p class="reveal-answer">The answer was <strong id="reveal-year"></strong></p>
+        <p class="reveal-diff">You were off by <strong id="reveal-diff"></strong></p>
+        <button id="next-btn" class="btn-primary">Next</button>
+      </div>
+    </section>
+
+    <section id="end-screen" class="screen">
+      <h1>Game over</h1>
+      <p class="total">You were off by<strong id="total-years">0 years</strong>across 10 guesses.</p>
+      <div id="fun-fact" class="fun-fact">
+        <span class="label">Fun fact</span>
+        <span id="fun-fact-text">Loading...</span>
+      </div>
+      <button id="replay-btn" class="btn-primary">Play again</button>
+    </section>
+  </main>
+
+  <script>
+    const MAX_YEAR = new Date().getFullYear();
+    const MIN_YEAR = 1900;
+
+    // Curated pool. Years come from APIs — we just pick recognisable items.
+    const ALBUMS = [
+      { artist: 'The Beatles', title: 'Abbey Road' },
+      { artist: 'Michael Jackson', title: 'Thriller' },
+      { artist: 'Nirvana', title: 'Nevermind' },
+      { artist: 'Pink Floyd', title: 'The Dark Side of the Moon' },
+      { artist: 'Fleetwood Mac', title: 'Rumours' },
+      { artist: 'Amy Winehouse', title: 'Back to Black' },
+      { artist: 'Adele', title: '21' },
+      { artist: 'Daft Punk', title: 'Random Access Memories' },
+      { artist: 'Radiohead', title: 'OK Computer' },
+      { artist: 'Queen', title: 'A Night at the Opera' },
+      { artist: 'David Bowie', title: 'The Rise and Fall of Ziggy Stardust' },
+      { artist: 'Beyoncé', title: 'Lemonade' },
+      { artist: 'Kendrick Lamar', title: 'To Pimp a Butterfly' },
+      { artist: 'Prince', title: 'Purple Rain' },
+      { artist: 'Stevie Wonder', title: 'Songs in the Key of Life' },
+      { artist: 'Arctic Monkeys', title: 'AM' },
+      { artist: 'Lorde', title: 'Pure Heroine' },
+      { artist: 'The Strokes', title: 'Is This It' },
+    ];
+
+    const MOVIES = [
+      'The Godfather',
+      'Jaws',
+      'Star Wars',
+      'Titanic',
+      'The Matrix',
+      'Pulp Fiction',
+      'The Dark Knight',
+      'Inception',
+      'Parasite',
+      'Interstellar',
+      'Blade Runner',
+      'Back to the Future',
+      'Jurassic Park',
+      'The Shawshank Redemption',
+      'Forrest Gump',
+      'Goodfellas',
+      'Fight Club',
+      'The Lion King',
+      'Gladiator',
+      'Mad Max: Fury Road',
+    ];
+
+    const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const shuffle = (arr) => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+
+    async function fetchAlbum({ artist, title }) {
+      const term = encodeURIComponent(`${artist} ${title}`);
+      const url = `https://itunes.apple.com/search?term=${term}&entity=album&limit=25`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const nTitle = normalize(title);
+      const nArtist = normalize(artist);
+      const matches = (data.results || []).filter(r =>
+        normalize(r.collectionName).includes(nTitle) &&
+        normalize(r.artistName).includes(nArtist) &&
+        r.releaseDate
+      );
+      if (!matches.length) return null;
+      matches.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+      const m = matches[0];
+      const year = new Date(m.releaseDate).getUTCFullYear();
+      if (year < MIN_YEAR || year > MAX_YEAR) return null;
+      const image = (m.artworkUrl100 || '').replace('100x100bb', '600x600bb');
+      return {
+        year,
+        image,
+        prompt: 'Album',
+        title: m.collectionName,
+        subtitle: m.artistName,
+      };
+    }
+
+    async function fetchMovie(title) {
+      const term = encodeURIComponent(title);
+      const url = `https://itunes.apple.com/search?term=${term}&entity=movie&limit=25`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const nTitle = normalize(title);
+      const withDate = (data.results || []).filter(r => r.releaseDate);
+      const exact = withDate.filter(r => normalize(r.trackName) === nTitle);
+      const partial = withDate.filter(r => normalize(r.trackName).startsWith(nTitle));
+      const matches = exact.length ? exact : partial;
+      if (!matches.length) return null;
+      matches.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+      const m = matches[0];
+      const year = new Date(m.releaseDate).getUTCFullYear();
+      if (year < MIN_YEAR || year > MAX_YEAR) return null;
+      const image = (m.artworkUrl100 || '').replace('100x100bb', '600x600bb');
+      return {
+        year,
+        image,
+        prompt: 'Film',
+        title: m.trackName,
+        subtitle: m.artistName ? `Directed by ${m.artistName}` : '',
+      };
+    }
+
+    async function fetchHistory() {
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const month = Math.floor(Math.random() * 12) + 1;
+        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+        const day = Math.floor(Math.random() * daysInMonth) + 1;
+        const mm = String(month).padStart(2, '0');
+        const dd = String(day).padStart(2, '0');
+        const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const candidates = (data.events || []).filter(e => {
+            const hasImage = e.pages && e.pages.some(p => p.thumbnail);
+            return hasImage && typeof e.year === 'number' && e.year >= MIN_YEAR && e.year <= MAX_YEAR;
+          });
+          if (!candidates.length) continue;
+          const ev = candidates[Math.floor(Math.random() * candidates.length)];
+          const page = ev.pages.find(p => p.thumbnail);
+          // Thumbnails from Wikipedia are small — swap dimensions for higher res where possible.
+          let image = page.thumbnail.source;
+          image = image.replace(/\/\d+px-/, '/600px-');
+          return {
+            year: ev.year,
+            image,
+            prompt: 'Historical event',
+            title: ev.text,
+            subtitle: `${new Date(2000, month - 1, day).toLocaleString('en-GB', { month: 'long' })} ${day}`,
+          };
+        } catch (e) { /* keep trying */ }
+      }
+      return null;
+    }
+
+    async function buildGame(n = 10) {
+      const albumCount = 4;
+      const movieCount = 3;
+      const historyCount = 3;
+
+      const albumItems = shuffle([...ALBUMS]).slice(0, albumCount + 3);
+      const movieItems = shuffle([...MOVIES]).slice(0, movieCount + 3);
+
+      const promises = [
+        ...albumItems.map(a => fetchAlbum(a).catch(() => null)),
+        ...movieItems.map(m => fetchMovie(m).catch(() => null)),
+      ];
+
+      const results = await Promise.all(promises);
+      const valid = results.filter(Boolean);
+
+      const albums = valid.filter(q => q.prompt === 'Album').slice(0, albumCount);
+      const movies = valid.filter(q => q.prompt === 'Film').slice(0, movieCount);
+
+      const historyNeeded = n - albums.length - movies.length;
+      const historyResults = [];
+      for (let i = 0; i < historyNeeded + 2 && historyResults.length < historyNeeded; i++) {
+        const h = await fetchHistory();
+        if (h && !historyResults.some(x => x.title === h.title)) historyResults.push(h);
+      }
+
+      const all = shuffle([...albums, ...movies, ...historyResults]).slice(0, n);
+      return all;
+    }
+
+    async function getFunFact(n) {
+      try {
+        const res = await fetch(`https://numbersapi.com/${n}/trivia?json&notfound=floor`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.text) return data.text;
+        }
+      } catch (e) { /* fall through */ }
+      // Fallback facts when Numbers API is unreachable (it's HTTP-only in some cases).
+      if (n === 0) return "Zero! A perfect game — every guess spot on. Nearly impossible. Are you a time traveller?";
+      if (n < 10) return `${n} years is less than a standard mortgage term. Razor-sharp guessing.`;
+      if (n < 30) return `${n} years is roughly one human generation.`;
+      if (n < 50) return `${n} years ago the World Wide Web was only just being invented.`;
+      if (n < 100) return `${n} years is about the average human lifespan.`;
+      if (n < 200) return `${n} years ago Queen Victoria was on the throne.`;
+      return `${n} years is a very long time — longer than the United States has had electric light bulbs in homes.`;
+    }
+
+    // ---- game state ----
+    const state = {
+      questions: [],
+      index: 0,
+      totalOff: 0,
+      lastGuess: null,
+    };
+
+    const $ = (sel) => document.querySelector(sel);
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $(id).classList.add('active');
+    }
+
+    function renderQuestion() {
+      const q = state.questions[state.index];
+      $('#q-counter').textContent = `Question ${state.index + 1} of ${state.questions.length}`;
+      $('#q-score').textContent = `Total off: ${state.totalOff} years`;
+      $('#q-prompt').textContent = q.prompt;
+      $('#q-title').textContent = q.title;
+      $('#q-subtitle').textContent = q.subtitle || '';
+      const wrap = $('#q-image-wrap');
+      const img = $('#q-image');
+      wrap.classList.add('no-image');
+      img.onload = () => wrap.classList.remove('no-image');
+      img.onerror = () => wrap.classList.add('no-image');
+      img.alt = q.title;
+      img.removeAttribute('src');
+      if (q.image) img.src = q.image;
+
+      $('#reveal').classList.add('hidden');
+      $('#guess-panel').style.display = '';
+      $('#submit-btn').disabled = false;
+
+      // reset slider to a neutral starting point each question
+      const slider = $('#year-slider');
+      slider.value = 1980;
+      $('#year-value').textContent = '1980';
+    }
+
+    function fireConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+      const colors = ['#ffcb47', '#ff7ac6', '#5fd39d', '#7cc4ff', '#c58bff', '#ffffff'];
+      for (let i = 0; i < 70; i++) {
+        const p = document.createElement('span');
+        p.className = 'confetti-piece';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width = (6 + Math.random() * 8) + 'px';
+        p.style.height = (8 + Math.random() * 10) + 'px';
+        p.style.setProperty('--drift', (Math.random() * 260 - 130) + 'px');
+        p.style.animationDelay = (Math.random() * 0.35) + 's';
+        p.style.animationDuration = (1.6 + Math.random() * 1.0) + 's';
+        container.appendChild(p);
+      }
+      setTimeout(() => container.remove(), 3200);
+    }
+
+    function showReaction(text) {
+      const el = document.createElement('div');
+      el.className = 'reaction-pop';
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1700);
+    }
+
+    function submitGuess() {
+      const guess = parseInt($('#year-slider').value, 10);
+      const q = state.questions[state.index];
+      const diff = Math.abs(guess - q.year);
+      state.totalOff += diff;
+      state.lastGuess = guess;
+
+      $('#reveal-year').textContent = q.year;
+      $('#reveal-diff').textContent = diff === 0 ? 'nothing — perfect!' : `${diff} ${diff === 1 ? 'year' : 'years'}`;
+      $('#guess-panel').style.display = 'none';
+      $('#reveal').classList.remove('hidden');
+      $('#q-score').textContent = `Total off: ${state.totalOff} years`;
+
+      if (diff === 0) fireConfetti();
+      else if (diff > 50) showReaction('Seriously? 😂');
+    }
+
+    function nextQuestion() {
+      state.index++;
+      if (state.index >= state.questions.length) {
+        showEnd();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    async function showEnd() {
+      show('#end-screen');
+      $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
+      $('#fun-fact-text').textContent = 'Loading...';
+      const fact = await getFunFact(state.totalOff);
+      $('#fun-fact-text').textContent = fact;
+    }
+
+    async function startGame() {
+      show('#loading-screen');
+      state.questions = [];
+      state.index = 0;
+      state.totalOff = 0;
+      try {
+        const qs = await buildGame(10);
+        if (qs.length < 5) throw new Error('Could not load enough questions. Check your connection?');
+        state.questions = qs;
+        show('#question-screen');
+        renderQuestion();
+      } catch (e) {
+        console.error(e);
+        const start = $('#start-screen');
+        let err = start.querySelector('.error');
+        if (!err) {
+          err = document.createElement('div');
+          err.className = 'error';
+          start.insertBefore(err, start.querySelector('.btn-primary'));
+        }
+        err.textContent = e.message || 'Something went wrong loading questions.';
+        show('#start-screen');
+      }
+    }
+
+    // ---- wire up ----
+    document.addEventListener('DOMContentLoaded', () => {
+      $('#start-btn').addEventListener('click', startGame);
+      $('#replay-btn').addEventListener('click', startGame);
+      $('#submit-btn').addEventListener('click', submitGuess);
+      $('#next-btn').addEventListener('click', nextQuestion);
+      $('#year-slider').addEventListener('input', (e) => {
+        $('#year-value').textContent = e.target.value;
+      });
+
+      const slider = $('#year-slider');
+      slider.max = String(MAX_YEAR);
+      document.querySelectorAll('.range-labels span')[1].textContent = String(MAX_YEAR);
+    });
+  </script>
+</body>
+</html>
