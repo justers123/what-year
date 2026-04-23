@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="googlebot" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="What Year?" />
+  <link rel="manifest" href="site.webmanifest" />
   <title>What Year?</title>
   <style>
     :root {
@@ -21,9 +27,12 @@
       --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       height: 100%;
@@ -50,11 +59,21 @@
       max-width: 560px;
       animation: fade 0.3s ease;
     }
-    .screen.active { display: block; }
+
+    .screen.active {
+      display: block;
+    }
 
     @keyframes fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     h1 {
@@ -67,8 +86,16 @@
       color: transparent;
     }
 
-    .tagline { color: var(--muted); font-size: 1.1rem; margin: 0 0 28px; line-height: 1.5; }
-    .muted { color: var(--muted); }
+    .tagline {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin: 0 0 28px;
+      line-height: 1.5;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
 
     .btn-primary {
       appearance: none;
@@ -83,9 +110,21 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
       box-shadow: 0 6px 20px rgba(255, 122, 198, 0.25);
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px rgba(255, 122, 198, 0.35); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(255, 122, 198, 0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     .spinner {
       width: 48px;
@@ -96,9 +135,26 @@
       animation: spin 0.8s linear infinite;
       margin: 0 auto 16px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    #loading-screen, #end-screen, #start-screen { text-align: center; }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loading-screen,
+    #end-screen,
+    #start-screen {
+      text-align: center;
+    }
+
+    .app-logo {
+      width: 96px;
+      height: 96px;
+      display: block;
+      margin: 0 auto 18px;
+      filter: drop-shadow(0 10px 24px rgba(255, 122, 198, 0.35));
+    }
 
     /* question */
     .q-header {
@@ -119,40 +175,39 @@
       margin-bottom: 20px;
     }
 
-    #q-image-wrap {
+    #q-icon-wrap {
       width: 100%;
       aspect-ratio: 1 / 1;
-      background: var(--bg-2);
+      background: linear-gradient(135deg, rgba(255, 122, 198, 0.12), rgba(255, 203, 71, 0.12));
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       position: relative;
     }
-    #q-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    #q-image-wrap.no-image #q-image { display: none; }
-    .image-fallback {
+
+    .q-icon {
       display: none;
-      width: 100%;
-      height: 100%;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(255, 122, 198, 0.12), rgba(255, 203, 71, 0.12));
-    }
-    #q-image-wrap.no-image .image-fallback { display: flex; }
-    .image-fallback svg {
       width: 45%;
       height: 45%;
-      opacity: 0.55;
       color: var(--accent);
     }
 
-    .q-body { padding: 20px 22px 22px; }
+    #q-icon-wrap[data-kind="album"] .q-icon[data-kind="album"],
+    #q-icon-wrap[data-kind="film"] .q-icon[data-kind="film"],
+    #q-icon-wrap[data-kind="history"] .q-icon[data-kind="history"] {
+      display: block;
+    }
+
+    .q-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .q-body {
+      padding: 20px 22px 22px;
+    }
+
     #q-prompt {
       margin: 0 0 6px;
       font-size: 0.85rem;
@@ -160,13 +215,18 @@
       text-transform: uppercase;
       color: var(--accent);
     }
+
     #q-title {
       margin: 0 0 6px;
       font-size: 1.35rem;
       line-height: 1.3;
       font-weight: 700;
     }
-    #q-subtitle { margin: 0; font-size: 0.95rem; }
+
+    #q-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+    }
 
     .year-input {
       background: var(--card);
@@ -182,6 +242,7 @@
       font-size: 0.95rem;
       color: var(--muted);
     }
+
     #year-value {
       color: var(--fg);
       font-weight: 700;
@@ -198,6 +259,7 @@
       border-radius: 999px;
       outline: none;
     }
+
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -209,6 +271,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
       border: 3px solid var(--accent);
     }
+
     input[type="range"]::-moz-range-thumb {
       width: 24px;
       height: 24px;
@@ -228,7 +291,9 @@
       font-variant-numeric: tabular-nums;
     }
 
-    #submit-btn { width: 100%; }
+    #submit-btn {
+      width: 100%;
+    }
 
     .reveal {
       background: var(--card);
@@ -239,12 +304,34 @@
       text-align: center;
       animation: fade 0.3s ease;
     }
-    .reveal.hidden { display: none; }
-    .reveal-answer { font-size: 1.1rem; margin: 0 0 6px; }
-    .reveal-answer strong { color: var(--accent); font-size: 1.6rem; }
-    .reveal-diff { margin: 0 0 18px; color: var(--muted); }
-    .reveal-diff strong { color: var(--fg); font-size: 1.3rem; }
-    #next-btn { width: 100%; }
+
+    .reveal.hidden {
+      display: none;
+    }
+
+    .reveal-answer {
+      font-size: 1.1rem;
+      margin: 0 0 6px;
+    }
+
+    .reveal-answer strong {
+      color: var(--accent);
+      font-size: 1.6rem;
+    }
+
+    .reveal-diff {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    .reveal-diff strong {
+      color: var(--fg);
+      font-size: 1.3rem;
+    }
+
+    #next-btn {
+      width: 100%;
+    }
 
     /* celebration / reaction */
     .confetti-container {
@@ -254,6 +341,7 @@
       overflow: hidden;
       z-index: 50;
     }
+
     .confetti-piece {
       position: absolute;
       top: -20px;
@@ -261,9 +349,17 @@
       border-radius: 2px;
       animation: confetti-fall 2s ease-out forwards;
     }
+
     @keyframes confetti-fall {
-      0% { transform: translate(0, -20px) rotate(0deg); opacity: 1; }
-      100% { transform: translate(var(--drift, 0px), 110vh) rotate(720deg); opacity: 1; }
+      0% {
+        transform: translate(0, -20px) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(var(--drift, 0px), 110vh) rotate(720deg);
+        opacity: 1;
+      }
     }
 
     .reaction-pop {
@@ -286,12 +382,31 @@
       filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.5));
       animation: reaction-pop 1.6s ease-out forwards;
     }
+
     @keyframes reaction-pop {
-      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); }
-      20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); }
-      40%  { transform: translate(-50%, -50%) scale(0.95) rotate(-2deg); }
-      70%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-      100% { opacity: 0; transform: translate(-50%, -58%) scale(1) rotate(0deg); }
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(-8deg);
+      }
+
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15) rotate(3deg);
+      }
+
+      40% {
+        transform: translate(-50%, -50%) scale(0.95) rotate(-2deg);
+      }
+
+      70% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -58%) scale(1) rotate(0deg);
+      }
     }
 
     /* end */
@@ -299,6 +414,7 @@
       font-size: 1.2rem;
       margin: 0 0 6px;
     }
+
     #end-screen .total strong {
       font-size: 2.4rem;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
@@ -308,6 +424,7 @@
       display: block;
       margin: 8px 0;
     }
+
     .fun-fact {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -319,6 +436,7 @@
       text-align: left;
       box-shadow: var(--shadow);
     }
+
     .fun-fact .label {
       display: block;
       color: var(--accent);
@@ -338,14 +456,20 @@
     }
 
     @media (max-width: 480px) {
-      h1 { font-size: 2.25rem; }
-      #q-title { font-size: 1.15rem; }
+      h1 {
+        font-size: 2.25rem;
+      }
+
+      #q-title {
+        font-size: 1.15rem;
+      }
     }
   </style>
 </head>
 <body>
   <main id="app">
     <section id="start-screen" class="screen active">
+      <img class="app-logo" src="logo.svg" alt="" />
       <h1>What Year?</h1>
       <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
@@ -363,13 +487,25 @@
       </div>
 
       <div class="q-card">
-        <div id="q-image-wrap" class="no-image">
-          <img id="q-image" alt="" />
-          <div class="image-fallback" aria-hidden="true">
+        <div id="q-icon-wrap" data-kind="album" aria-hidden="true">
+          <div class="q-icon" data-kind="album">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              <circle cx="12" cy="12" r="9"></circle>
+              <circle cx="12" cy="12" r="2.2"></circle>
+              <path d="M12 3a9 9 0 0 1 9 9"></path>
+              <path d="M12 21a9 9 0 0 1-9-9"></path>
+            </svg>
+          </div>
+          <div class="q-icon" data-kind="film">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+              <path d="M3 9h18M3 15h18M8 4v16M16 4v16"></path>
+            </svg>
+          </div>
+          <div class="q-icon" data-kind="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <polyline points="12 7 12 12 15.5 14"></polyline>
             </svg>
           </div>
         </div>
@@ -412,110 +548,84 @@
     const MAX_YEAR = new Date().getFullYear();
     const MIN_YEAR = 1900;
 
-    // Curated pool. Years come from APIs — we just pick recognisable items.
-    const ALBUMS = [
-      { artist: 'The Beatles', title: 'Abbey Road' },
-      { artist: 'Michael Jackson', title: 'Thriller' },
-      { artist: 'Nirvana', title: 'Nevermind' },
-      { artist: 'Pink Floyd', title: 'The Dark Side of the Moon' },
-      { artist: 'Fleetwood Mac', title: 'Rumours' },
-      { artist: 'Amy Winehouse', title: 'Back to Black' },
-      { artist: 'Adele', title: '21' },
-      { artist: 'Daft Punk', title: 'Random Access Memories' },
-      { artist: 'Radiohead', title: 'OK Computer' },
-      { artist: 'Queen', title: 'A Night at the Opera' },
-      { artist: 'David Bowie', title: 'The Rise and Fall of Ziggy Stardust' },
-      { artist: 'Beyoncé', title: 'Lemonade' },
-      { artist: 'Kendrick Lamar', title: 'To Pimp a Butterfly' },
-      { artist: 'Prince', title: 'Purple Rain' },
-      { artist: 'Stevie Wonder', title: 'Songs in the Key of Life' },
-      { artist: 'Arctic Monkeys', title: 'AM' },
-      { artist: 'Lorde', title: 'Pure Heroine' },
-      { artist: 'The Strokes', title: 'Is This It' },
+    // Seed terms used to fish random items out of the iTunes search API.
+    // Each search returns up to 200 results; we pick one at random.
+    const ALBUM_SEEDS = [
+      'love', 'night', 'star', 'blue', 'fire', 'sun', 'moon', 'rain',
+      'gold', 'heart', 'dream', 'time', 'road', 'dark', 'heaven',
+      'wonder', 'days', 'river', 'forever', 'live', 'home', 'free',
+      'king', 'queen', 'city', 'girl', 'boy', 'black', 'white', 'red',
+      'light', 'young', 'song', 'world', 'little', 'summer', 'winter',
     ];
-
-    const MOVIES = [
-      'The Godfather',
-      'Jaws',
-      'Star Wars',
-      'Titanic',
-      'The Matrix',
-      'Pulp Fiction',
-      'The Dark Knight',
-      'Inception',
-      'Parasite',
-      'Interstellar',
-      'Blade Runner',
-      'Back to the Future',
-      'Jurassic Park',
-      'The Shawshank Redemption',
-      'Forrest Gump',
-      'Goodfellas',
-      'Fight Club',
-      'The Lion King',
-      'Gladiator',
-      'Mad Max: Fury Road',
+    const MOVIE_SEEDS = [
+      'man', 'last', 'night', 'star', 'dark', 'great', 'hero', 'return',
+      'city', 'love', 'war', 'king', 'wild', 'day', 'red', 'silver',
+      'deep', 'kill', 'gold', 'fire', 'rise', 'first', 'queen',
+      'train', 'bridge', 'river', 'black', 'white', 'ghost', 'big',
+      'american', 'little', 'young', 'dead', 'road',
     ];
+    // Strip iTunes reissues / deluxe editions — they report the reissue year, not the original.
+    const REISSUE_RE = /\b(remaster|remastered|deluxe|anniversary|reissue|expanded|bonus|re-?release|collector|edition)\b/i;
 
+    const MAX_WORDS = 20;
     const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const shuffle = (arr) => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+    const wordCount = (s) => (s || '').trim().split(/\s+/).filter(Boolean).length;
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    async function fetchAlbum({ artist, title }) {
-      const term = encodeURIComponent(`${artist} ${title}`);
-      const url = `https://itunes.apple.com/search?term=${term}&entity=album&limit=25`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const data = await res.json();
-      const nTitle = normalize(title);
-      const nArtist = normalize(artist);
-      const matches = (data.results || []).filter(r =>
-        normalize(r.collectionName).includes(nTitle) &&
-        normalize(r.artistName).includes(nArtist) &&
-        r.releaseDate
-      );
-      if (!matches.length) return null;
-      matches.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
-      const m = matches[0];
-      const year = new Date(m.releaseDate).getUTCFullYear();
-      if (year < MIN_YEAR || year > MAX_YEAR) return null;
-      const image = (m.artworkUrl100 || '').replace('100x100bb', '600x600bb');
-      return {
-        year,
-        image,
-        prompt: 'Album',
-        title: m.collectionName,
-        subtitle: m.artistName,
-      };
+    async function fetchAlbumPool() {
+      const seed = pick(ALBUM_SEEDS);
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(seed)}&entity=album&limit=200`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results || []).map(r => {
+          if (!r.releaseDate || !r.collectionName || !r.artistName) return null;
+          if (REISSUE_RE.test(r.collectionName)) return null;
+          if (wordCount(r.collectionName) > MAX_WORDS) return null;
+          const year = new Date(r.releaseDate).getUTCFullYear();
+          if (year < MIN_YEAR || year > MAX_YEAR) return null;
+          return {
+            year,
+            kind: 'album',
+            prompt: 'Album',
+            title: r.collectionName,
+            subtitle: r.artistName,
+          };
+        }).filter(Boolean);
+      } catch (e) {
+        return [];
+      }
     }
 
-    async function fetchMovie(title) {
-      const term = encodeURIComponent(title);
-      const url = `https://itunes.apple.com/search?term=${term}&entity=movie&limit=25`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const data = await res.json();
-      const nTitle = normalize(title);
-      const withDate = (data.results || []).filter(r => r.releaseDate);
-      const exact = withDate.filter(r => normalize(r.trackName) === nTitle);
-      const partial = withDate.filter(r => normalize(r.trackName).startsWith(nTitle));
-      const matches = exact.length ? exact : partial;
-      if (!matches.length) return null;
-      matches.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
-      const m = matches[0];
-      const year = new Date(m.releaseDate).getUTCFullYear();
-      if (year < MIN_YEAR || year > MAX_YEAR) return null;
-      const image = (m.artworkUrl100 || '').replace('100x100bb', '600x600bb');
-      return {
-        year,
-        image,
-        prompt: 'Film',
-        title: m.trackName,
-        subtitle: m.artistName ? `Directed by ${m.artistName}` : '',
-      };
+    async function fetchMoviePool() {
+      const seed = pick(MOVIE_SEEDS);
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(seed)}&entity=movie&limit=200`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results || []).map(r => {
+          if (!r.releaseDate || !r.trackName) return null;
+          if (wordCount(r.trackName) > MAX_WORDS) return null;
+          const year = new Date(r.releaseDate).getUTCFullYear();
+          if (year < MIN_YEAR || year > MAX_YEAR) return null;
+          return {
+            year,
+            kind: 'film',
+            prompt: 'Film',
+            title: r.trackName,
+            subtitle: r.artistName ? `Directed by ${r.artistName}` : '',
+          };
+        }).filter(Boolean);
+      } catch (e) {
+        return [];
+      }
     }
 
     async function fetchHistory() {
-      for (let attempt = 0; attempt < 6; attempt++) {
+      for (let attempt = 0; attempt < 8; attempt++) {
         const month = Math.floor(Math.random() * 12) + 1;
         const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
         const day = Math.floor(Math.random() * daysInMonth) + 1;
@@ -526,24 +636,24 @@
           const res = await fetch(url);
           if (!res.ok) continue;
           const data = await res.json();
-          const candidates = (data.events || []).filter(e => {
-            const hasImage = e.pages && e.pages.some(p => p.thumbnail);
-            return hasImage && typeof e.year === 'number' && e.year >= MIN_YEAR && e.year <= MAX_YEAR;
-          });
+          const candidates = (data.events || []).filter(e =>
+            typeof e.year === 'number' &&
+            e.year >= MIN_YEAR && e.year <= MAX_YEAR &&
+            typeof e.text === 'string' &&
+            wordCount(e.text) <= MAX_WORDS
+          );
           if (!candidates.length) continue;
           const ev = candidates[Math.floor(Math.random() * candidates.length)];
-          const page = ev.pages.find(p => p.thumbnail);
-          // Thumbnails from Wikipedia are small — swap dimensions for higher res where possible.
-          let image = page.thumbnail.source;
-          image = image.replace(/\/\d+px-/, '/600px-');
           return {
             year: ev.year,
-            image,
+            kind: 'history',
             prompt: 'Historical event',
             title: ev.text,
             subtitle: `${new Date(2000, month - 1, day).toLocaleString('en-GB', { month: 'long' })} ${day}`,
           };
-        } catch (e) { /* keep trying */ }
+        } catch (e) {
+          /* keep trying */
+        }
       }
       return null;
     }
@@ -551,21 +661,25 @@
     async function buildGame(n = 10) {
       const albumCount = 4;
       const movieCount = 3;
-      const historyCount = 3;
 
-      const albumItems = shuffle([...ALBUMS]).slice(0, albumCount + 3);
-      const movieItems = shuffle([...MOVIES]).slice(0, movieCount + 3);
+      // Fetch a handful of pools in parallel, each seeded with a different term, for variety.
+      const [a1, a2, a3, m1, m2, m3] = await Promise.all([
+        fetchAlbumPool(), fetchAlbumPool(), fetchAlbumPool(),
+        fetchMoviePool(), fetchMoviePool(), fetchMoviePool(),
+      ]);
 
-      const promises = [
-        ...albumItems.map(a => fetchAlbum(a).catch(() => null)),
-        ...movieItems.map(m => fetchMovie(m).catch(() => null)),
-      ];
+      const dedupe = (items) => {
+        const seen = new Set();
+        return items.filter(q => {
+          const key = normalize(q.title + '|' + (q.subtitle || ''));
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      };
 
-      const results = await Promise.all(promises);
-      const valid = results.filter(Boolean);
-
-      const albums = valid.filter(q => q.prompt === 'Album').slice(0, albumCount);
-      const movies = valid.filter(q => q.prompt === 'Film').slice(0, movieCount);
+      const albums = shuffle(dedupe([...a1, ...a2, ...a3])).slice(0, albumCount);
+      const movies = shuffle(dedupe([...m1, ...m2, ...m3])).slice(0, movieCount);
 
       const historyNeeded = n - albums.length - movies.length;
       const historyResults = [];
@@ -580,13 +694,20 @@
 
     async function getFunFact(n) {
       try {
-        const res = await fetch(`https://numbersapi.com/${n}/trivia?json&notfound=floor`);
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 2500);
+        const res = await fetch(`https://numbersapi.com/${n}/trivia?json&notfound=floor`, {
+          signal: ctrl.signal
+        });
+        clearTimeout(t);
         if (res.ok) {
           const data = await res.json();
           if (data && data.text) return data.text;
         }
-      } catch (e) { /* fall through */ }
-      // Fallback facts when Numbers API is unreachable (it's HTTP-only in some cases).
+      } catch (e) {
+        /* fall through */
+      }
+      // Fallback facts when Numbers API is unreachable (it's HTTP-only or blocked as mixed content in most browsers).
       if (n === 0) return "Zero! A perfect game — every guess spot on. Nearly impossible. Are you a time traveller?";
       if (n < 10) return `${n} years is less than a standard mortgage term. Razor-sharp guessing.`;
       if (n < 30) return `${n} years is roughly one human generation.`;
@@ -618,14 +739,7 @@
       $('#q-prompt').textContent = q.prompt;
       $('#q-title').textContent = q.title;
       $('#q-subtitle').textContent = q.subtitle || '';
-      const wrap = $('#q-image-wrap');
-      const img = $('#q-image');
-      wrap.classList.add('no-image');
-      img.onload = () => wrap.classList.remove('no-image');
-      img.onerror = () => wrap.classList.add('no-image');
-      img.alt = q.title;
-      img.removeAttribute('src');
-      if (q.image) img.src = q.image;
+      $('#q-icon-wrap').dataset.kind = q.kind || 'history';
 
       $('#reveal').classList.add('hidden');
       $('#guess-panel').style.display = '';
