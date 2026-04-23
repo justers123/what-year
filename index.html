@@ -548,14 +548,24 @@
     const MAX_YEAR = new Date().getFullYear();
     const MIN_YEAR = 1900;
 
-    // Seed terms used to fish random items out of the iTunes search API.
-    // Each search returns up to 200 results; we pick one at random.
-    const ALBUM_SEEDS = [
-      'love', 'night', 'star', 'blue', 'fire', 'sun', 'moon', 'rain',
-      'gold', 'heart', 'dream', 'time', 'road', 'dark', 'heaven',
-      'wonder', 'days', 'river', 'forever', 'live', 'home', 'free',
-      'king', 'queen', 'city', 'girl', 'boy', 'black', 'white', 'red',
-      'light', 'young', 'song', 'world', 'little', 'summer', 'winter',
+    // Iconic artists across decades — we ask iTunes for their discography
+    // (attribute=artistTerm) and pick a random album. Keeps the pool recognisable
+    // without hard-coding specific titles.
+    const ALBUM_ARTISTS = [
+      'The Beatles', 'The Rolling Stones', 'Bob Dylan', 'Jimi Hendrix', 'The Beach Boys',
+      'Led Zeppelin', 'Pink Floyd', 'Queen', 'David Bowie', 'Fleetwood Mac',
+      'ABBA', 'Stevie Wonder', 'Bob Marley', 'Elton John', 'Marvin Gaye',
+      'Michael Jackson', 'Prince', 'Madonna', 'Bruce Springsteen', 'U2',
+      'Whitney Houston', 'Tina Turner', 'The Police', 'Dire Straits',
+      'Nirvana', 'Oasis', 'Radiohead', 'R.E.M.', 'Metallica', 'Guns N Roses',
+      'Mariah Carey', 'Spice Girls', 'Backstreet Boys', 'Tupac',
+      'Jay-Z', 'Eminem', 'Dr. Dre', 'Outkast',
+      'Beyoncé', 'Coldplay', 'Kanye West', 'Amy Winehouse', 'Rihanna',
+      'Arctic Monkeys', 'The Strokes', 'Gorillaz', 'The White Stripes',
+      'Adele', 'Taylor Swift', 'Drake', 'Kendrick Lamar', 'Daft Punk',
+      'Lana Del Rey', 'Lorde', 'Ed Sheeran', 'Billie Eilish', 'Frank Ocean',
+      'Bruno Mars', 'Harry Styles', 'Dua Lipa', 'SZA', 'The Weeknd',
+      'Fleet Foxes', 'Bon Iver', 'Arcade Fire', 'Tame Impala',
     ];
     const MOVIE_SEEDS = [
       'man', 'last', 'night', 'star', 'dark', 'great', 'hero', 'return',
@@ -574,8 +584,9 @@
     const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
     async function fetchAlbumPool() {
-      const seed = pick(ALBUM_SEEDS);
-      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(seed)}&entity=album&limit=200`;
+      const artist = pick(ALBUM_ARTISTS);
+      const nArtist = normalize(artist);
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=album&attribute=artistTerm&limit=200`;
       try {
         const res = await fetch(url);
         if (!res.ok) return [];
@@ -584,6 +595,8 @@
           if (!r.releaseDate || !r.collectionName || !r.artistName) return null;
           if (REISSUE_RE.test(r.collectionName)) return null;
           if (wordCount(r.collectionName) > MAX_WORDS) return null;
+          // Drop tribute / cover bands that sneak through artistTerm matching.
+          if (!normalize(r.artistName).includes(nArtist)) return null;
           const year = new Date(r.releaseDate).getUTCFullYear();
           if (year < MIN_YEAR || year > MAX_YEAR) return null;
           return {
