@@ -446,6 +446,89 @@
       margin-bottom: 6px;
     }
 
+    .high-scores {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin: 0 0 24px;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    .high-scores h3 {
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+
+    .high-scores ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .high-scores li {
+      position: relative;
+      display: grid;
+      grid-template-columns: 22px auto 1fr;
+      gap: 10px;
+      align-items: baseline;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+    }
+
+    .high-scores li + li {
+      margin-top: 4px;
+    }
+
+    .high-scores li::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: var(--pct, 0%);
+      background: linear-gradient(90deg, rgba(255, 203, 71, 0.22), rgba(255, 122, 198, 0.16));
+      z-index: 0;
+      transition: width 0.4s ease;
+    }
+
+    .high-scores li > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .high-scores li.current {
+      outline: 1px solid rgba(255, 203, 71, 0.55);
+    }
+
+    .high-scores .rank {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .high-scores .score {
+      font-weight: 700;
+    }
+
+    .high-scores .date {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: right;
+    }
+
+    .high-scores .empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
     .error {
       color: var(--bad);
       background: rgba(255, 107, 107, 0.08);
@@ -540,6 +623,10 @@
         <span class="label">Fun fact</span>
         <span id="fun-fact-text">Loading...</span>
       </div>
+      <div id="high-scores" class="high-scores">
+        <h3>Top 10 best scores</h3>
+        <ol id="high-scores-list"></ol>
+      </div>
       <button id="replay-btn" class="btn-primary">Play again</button>
     </section>
   </main>
@@ -552,20 +639,80 @@
     // (attribute=artistTerm) and pick a random album. Keeps the pool recognisable
     // without hard-coding specific titles.
     const ALBUM_ARTISTS = [
+      // 60s / 70s rock legends
       'The Beatles', 'The Rolling Stones', 'Bob Dylan', 'Jimi Hendrix', 'The Beach Boys',
+      'The Who', 'The Doors', 'Simon & Garfunkel', 'Creedence Clearwater Revival',
+      'The Kinks', 'The Monkees', 'The Bee Gees', 'The Band', 'Grateful Dead',
       'Led Zeppelin', 'Pink Floyd', 'Queen', 'David Bowie', 'Fleetwood Mac',
-      'ABBA', 'Stevie Wonder', 'Bob Marley', 'Elton John', 'Marvin Gaye',
-      'Michael Jackson', 'Prince', 'Madonna', 'Bruce Springsteen', 'U2',
-      'Whitney Houston', 'Tina Turner', 'The Police', 'Dire Straits',
-      'Nirvana', 'Oasis', 'Radiohead', 'R.E.M.', 'Metallica', 'Guns N Roses',
-      'Mariah Carey', 'Spice Girls', 'Backstreet Boys', 'Tupac',
-      'Jay-Z', 'Eminem', 'Dr. Dre', 'Outkast',
-      'Beyoncé', 'Coldplay', 'Kanye West', 'Amy Winehouse', 'Rihanna',
-      'Arctic Monkeys', 'The Strokes', 'Gorillaz', 'The White Stripes',
-      'Adele', 'Taylor Swift', 'Drake', 'Kendrick Lamar', 'Daft Punk',
-      'Lana Del Rey', 'Lorde', 'Ed Sheeran', 'Billie Eilish', 'Frank Ocean',
-      'Bruno Mars', 'Harry Styles', 'Dua Lipa', 'SZA', 'The Weeknd',
-      'Fleet Foxes', 'Bon Iver', 'Arcade Fire', 'Tame Impala',
+      'Eagles', 'Aerosmith', 'Neil Young', 'Tom Petty', 'Lynyrd Skynyrd',
+      'Rod Stewart', 'Van Morrison', 'Joni Mitchell', 'James Taylor',
+      'Carole King', 'Cat Stevens', 'Chicago', 'Steely Dan',
+      'Boston', 'Journey', 'Foreigner', 'Supertramp',
+      'Yes', 'Rush', 'Electric Light Orchestra', 'Wings',
+      'Peter Gabriel', 'Cream', 'Eric Clapton', 'Jethro Tull',
+      // Hard rock / metal
+      'AC/DC', 'Black Sabbath', 'Deep Purple', 'Van Halen', 'Bon Jovi',
+      'Iron Maiden', 'Ozzy Osbourne', 'Kiss', 'Metallica', 'Guns N Roses',
+      'Judas Priest', 'Def Leppard', 'Motley Crue', 'Scorpions',
+      'Motörhead', 'Megadeth', 'Slayer',
+      // Soul / Motown / R&B / funk
+      'Stevie Wonder', 'Marvin Gaye', 'Aretha Franklin', 'Ray Charles',
+      'James Brown', 'Diana Ross', 'Tina Turner',
+      'The Temptations', 'The Four Tops', 'Smokey Robinson',
+      'Otis Redding', 'Sam Cooke', 'Al Green', 'Gladys Knight',
+      'Earth Wind & Fire', 'Kool & the Gang', 'Commodores',
+      'The Isley Brothers', 'Curtis Mayfield', 'Barry White',
+      'Donna Summer', 'Gloria Gaynor', 'Sade', 'Luther Vandross',
+      'The Jackson 5', 'The Supremes',
+      // Country / standards
+      'Elvis Presley', 'Frank Sinatra', 'Johnny Cash', 'Dolly Parton',
+      'Willie Nelson', 'Kenny Rogers', 'Glen Campbell', 'Kris Kristofferson',
+      'Garth Brooks', 'George Strait', 'Reba McEntire',
+      'Faith Hill', 'Tim McGraw', 'Alan Jackson', 'Carrie Underwood',
+      // Jazz / blues
+      'Louis Armstrong', 'Nat King Cole', 'Ella Fitzgerald',
+      'Billie Holiday', 'Duke Ellington', 'Miles Davis',
+      'BB King', 'Nina Simone',
+      // 70s / 80s pop & rock
+      'ABBA', 'Bob Marley', 'Elton John', 'Billy Joel', 'Phil Collins',
+      'Genesis', 'Santana', 'The Police', 'Dire Straits', 'Bruce Springsteen', 'U2',
+      // Punk / new wave / 80s
+      'The Ramones', 'The Clash', 'Sex Pistols', 'Blondie',
+      'Talking Heads', 'The Pretenders', 'Elvis Costello', 'Billy Idol',
+      'Duran Duran', 'Depeche Mode', 'The Cure', 'Eurythmics',
+      'Pet Shop Boys', 'New Order', 'Joy Division', 'The Smiths',
+      'Cyndi Lauper', 'George Michael', 'Cher', 'Lionel Richie', 'Hall & Oates',
+      // 80s / 90s pop icons
+      'Michael Jackson', 'Prince', 'Madonna', 'Whitney Houston',
+      'Mariah Carey', 'Janet Jackson', 'Celine Dion',
+      // 90s alt / grunge / britpop
+      'Nirvana', 'Pearl Jam', 'Red Hot Chili Peppers', 'Foo Fighters',
+      'Green Day', 'Weezer', 'Blur', 'Oasis', 'Radiohead', 'R.E.M.',
+      'Soundgarden', 'Alice in Chains', 'Stone Temple Pilots',
+      'Smashing Pumpkins', 'Beastie Boys', 'The Stone Roses',
+      // 90s / 00s pop
+      'Spice Girls', 'Backstreet Boys', 'NSYNC', 'Britney Spears',
+      'Christina Aguilera', 'Shania Twain', 'Shakira', 'Alanis Morissette',
+      // Hip-hop & R&B
+      'Tupac', 'Notorious B.I.G.', 'Snoop Dogg', 'Jay-Z', 'Eminem', 'Dr. Dre',
+      'Outkast', '50 Cent', 'Kanye West',
+      'Run-DMC', 'LL Cool J', 'Public Enemy', 'Nas', 'Wu-Tang Clan',
+      'Lauryn Hill', 'TLC', "Destiny's Child", 'Boyz II Men',
+      'Mary J. Blige', 'Alicia Keys', 'John Legend', 'Lil Wayne',
+      'Missy Elliott',
+      // 00s pop / alt
+      'Coldplay', 'Amy Winehouse', 'Beyoncé', 'Rihanna', 'Arctic Monkeys',
+      'Gorillaz', 'The White Stripes', 'Usher', 'Justin Timberlake', 'Pink',
+      'Daft Punk', 'The Killers', 'Muse', 'Kings of Leon',
+      'Mumford & Sons', 'Snow Patrol',
+      // 00s / 10s pop-rock
+      'Black Eyed Peas', 'Maroon 5', 'Imagine Dragons',
+      'Fall Out Boy', 'My Chemical Romance', 'Paramore',
+      'Twenty One Pilots',
+      // Current stars
+      'Adele', 'Taylor Swift', 'Drake', 'Kendrick Lamar',
+      'Ed Sheeran', 'Billie Eilish', 'Bruno Mars', 'Harry Styles',
+      'Dua Lipa', 'The Weeknd',
     ];
     const MOVIE_SEEDS = [
       'man', 'last', 'night', 'star', 'dark', 'great', 'hero', 'return',
@@ -576,6 +723,165 @@
     ];
     // Strip iTunes reissues / deluxe editions — they report the reissue year, not the original.
     const REISSUE_RE = /\b(remaster|remastered|deluxe|anniversary|reissue|expanded|bonus|re-?release|collector|edition)\b/i;
+    // iTunes tags non-album releases with a trailing " - EP" or " - Single" in the collection name.
+    const NON_ALBUM_RE = /\s-\s(EP|Single)\s*$/i;
+
+    // Curated, instantly-recognisable historical events. Years are obfuscated
+    // (XOR 0xBEEF, hex) so they can't be read at a glance when inspecting the source
+    // — decodeYear() in-app recovers the real value.
+    const YEAR_KEY = 0xBEEF;
+    const decodeYear = (s) => parseInt(s, 16) ^ YEAR_KEY;
+
+    const FAMOUS_EVENTS = [
+      // Space & science
+      { y: 'b94a', t: 'The Soviet Union launches Sputnik, the first artificial satellite' },
+      { y: 'b949', t: 'The United States establishes NASA as its space agency' },
+      { y: 'b946', t: 'Yuri Gagarin becomes the first human to travel into outer space' },
+      { y: 'b945', t: 'John Glenn becomes the first American to orbit the Earth' },
+      { y: 'b944', t: 'Valentina Tereshkova becomes the first woman in space' },
+      { y: 'b95e', t: 'Neil Armstrong and Buzz Aldrin walk on the Moon during Apollo 11' },
+      { y: 'b95d', t: 'The Apollo 13 crew returns safely to Earth after an in-flight emergency' },
+      { y: 'b95b', t: 'Apollo 17 carries the final crewed mission to the Moon' },
+      { y: 'b956', t: 'NASA launches the Voyager 1 space probe' },
+      { y: 'b952', t: 'The first Space Shuttle, Columbia, launches into orbit' },
+      { y: 'b950', t: 'Sally Ride becomes the first American woman in space' },
+      { y: 'b929', t: 'The Hubble Space Telescope is launched into orbit' },
+      { y: 'b923', t: 'Dolly the sheep, the first cloned mammal, is born in Scotland' },
+      { y: 'b921', t: 'Construction begins on the International Space Station' },
+      { y: 'b939', t: 'Pluto is officially reclassified as a dwarf planet' },
+      { y: 'b937', t: 'The Large Hadron Collider is switched on for the first time at CERN' },
+      { y: 'b933', t: "NASA's Curiosity rover successfully lands on Mars" },
+      { y: 'b933', t: 'The discovery of the Higgs boson is announced at CERN' },
+      { y: 'b933', t: 'Felix Baumgartner free-falls from the edge of space' },
+      { y: 'b930', t: "NASA's New Horizons spacecraft flies by Pluto" },
+      { y: 'b90b', t: "SpaceX's Crew Dragon carries the first commercial astronauts to orbit" },
+      { y: 'b90a', t: "NASA's Perseverance rover lands on Mars" },
+      { y: 'b90a', t: 'The James Webb Space Telescope is launched into space' },
+
+      // British royals & UK politics
+      { y: 'b94e', t: 'Queen Elizabeth II is crowned at Westminster Abbey' },
+      { y: 'b95e', t: 'Charles is invested as the Prince of Wales at Caernarfon Castle' },
+      { y: 'b956', t: 'The UK celebrates the Silver Jubilee of Queen Elizabeth II' },
+      { y: 'b954', t: "Margaret Thatcher becomes Britain's first female Prime Minister" },
+      { y: 'b952', t: "Prince Charles marries Lady Diana Spencer at St Paul's Cathedral" },
+      { y: 'b929', t: 'Margaret Thatcher resigns as UK Prime Minister' },
+      { y: 'b922', t: 'Tony Blair becomes Prime Minister after a Labour landslide' },
+      { y: 'b935', t: 'David Cameron becomes UK Prime Minister in a coalition government' },
+      { y: 'b934', t: 'Prince William marries Catherine Middleton at Westminster Abbey' },
+      { y: 'b933', t: 'The UK celebrates the Diamond Jubilee of Queen Elizabeth II' },
+      { y: 'b932', t: 'Prince George, son of William and Catherine, is born' },
+      { y: 'b90f', t: 'The United Kingdom votes to leave the European Union' },
+      { y: 'b90f', t: 'Theresa May becomes UK Prime Minister after the Brexit vote' },
+      { y: 'b90d', t: 'Prince Harry marries Meghan Markle at Windsor Castle' },
+      { y: 'b90c', t: 'Boris Johnson becomes UK Prime Minister' },
+      { y: 'b909', t: 'Rishi Sunak becomes the first British Asian Prime Minister' },
+      { y: 'b908', t: 'King Charles III is crowned at Westminster Abbey' },
+      { y: 'b907', t: 'Keir Starmer leads Labour to a landslide UK general election victory' },
+
+      // World politics & landmark events
+      { y: 'b944', t: 'Martin Luther King Jr. delivers his "I Have a Dream" speech in Washington' },
+      { y: 'b953', t: 'Ronald Reagan is elected President of the United States' },
+      { y: 'b92a', t: 'The Berlin Wall falls, opening the border between East and West Germany' },
+      { y: 'b929', t: 'Nelson Mandela is released from prison after 27 years' },
+      { y: 'b928', t: 'The Soviet Union is formally dissolved' },
+      { y: 'b927', t: 'Bill Clinton is elected President of the United States' },
+      { y: 'b926', t: 'The European Union is established under the Maastricht Treaty' },
+      { y: 'b925', t: 'Nelson Mandela is inaugurated as President of South Africa' },
+      { y: 'b922', t: 'The United Kingdom hands Hong Kong back to China' },
+      { y: 'b920', t: 'The Euro is introduced as an official European currency' },
+      { y: 'b937', t: 'Barack Obama is elected the first Black President of the United States' },
+      { y: 'b932', t: 'Pope Francis is elected as the first Jesuit Pope' },
+      { y: 'b930', t: 'Ireland legalises same-sex marriage by popular vote' },
+      { y: 'b930', t: 'The US Supreme Court legalises same-sex marriage nationwide' },
+      { y: 'b90f', t: 'Donald Trump is elected President of the United States' },
+      { y: 'b90e', t: 'Emmanuel Macron is elected President of France' },
+      { y: 'b90b', t: 'Joe Biden is elected President of the United States' },
+      { y: 'b907', t: 'Donald Trump is elected to a second term as US President' },
+
+      // Technology
+      { y: 'b958', t: 'Bill Gates and Paul Allen found Microsoft' },
+      { y: 'b957', t: 'Steve Jobs and Steve Wozniak found Apple' },
+      { y: 'b954', t: 'Sony launches the Walkman personal stereo' },
+      { y: 'b952', t: 'IBM introduces its first personal computer' },
+      { y: 'b92f', t: 'Apple introduces the original Macintosh computer' },
+      { y: 'b92e', t: 'Nintendo launches the Nintendo Entertainment System in North America' },
+      { y: 'b92a', t: 'Tim Berners-Lee proposes what becomes the World Wide Web' },
+      { y: 'b92a', t: 'Nintendo releases the Game Boy handheld console' },
+      { y: 'b925', t: 'Sony releases the original PlayStation in Japan' },
+      { y: 'b924', t: 'Microsoft releases Windows 95' },
+      { y: 'b923', t: 'Bandai launches the Tamagotchi virtual pet' },
+      { y: 'b922', t: "IBM's Deep Blue defeats world chess champion Garry Kasparov" },
+      { y: 'b921', t: 'Larry Page and Sergey Brin found Google' },
+      { y: 'b93f', t: 'Sony releases the PlayStation 2' },
+      { y: 'b93e', t: 'Apple releases the first iPod' },
+      { y: 'b93e', t: 'Wikipedia is launched' },
+      { y: 'b93b', t: 'Mark Zuckerberg launches Facebook from his Harvard dorm room' },
+      { y: 'b93a', t: 'YouTube is founded in a garage in California' },
+      { y: 'b939', t: 'Twitter is launched' },
+      { y: 'b938', t: 'Apple releases the first iPhone' },
+      { y: 'b936', t: 'Bitcoin is launched as the first cryptocurrency' },
+      { y: 'b935', t: 'Apple releases the first iPad' },
+      { y: 'b935', t: 'Instagram is launched' },
+      { y: 'b934', t: 'Apple introduces Siri on the iPhone 4S' },
+      { y: 'b930', t: 'Apple releases the first Apple Watch' },
+      { y: 'b90e', t: 'Nintendo releases the Switch console' },
+      { y: 'b909', t: 'OpenAI releases ChatGPT to the public' },
+
+      // Sport
+      { y: 'b941', t: 'England wins the FIFA World Cup, beating West Germany at Wembley' },
+      { y: 'b95f', t: 'Mexico City hosts the Summer Olympic Games' },
+      { y: 'b953', t: 'The US ice hockey team beats the Soviet Union in the "Miracle on Ice"' },
+      { y: 'b92f', t: 'Los Angeles hosts the Summer Olympic Games' },
+      { y: 'b92b', t: 'Seoul hosts the Summer Olympic Games' },
+      { y: 'b927', t: 'Barcelona hosts the Summer Olympic Games' },
+      { y: 'b923', t: 'Atlanta hosts the Summer Olympic Games' },
+      { y: 'b923', t: 'England hosts the Euro 96 football championship' },
+      { y: 'b922', t: 'Tiger Woods wins his first Masters at age 21' },
+      { y: 'b921', t: 'France hosts and wins the FIFA World Cup' },
+      { y: 'b920', t: 'Manchester United completes a historic treble' },
+      { y: 'b93f', t: 'Sydney hosts the Summer Olympic Games' },
+      { y: 'b93c', t: 'England wins the Rugby World Cup in Australia' },
+      { y: 'b93b', t: 'Athens hosts the Summer Olympic Games' },
+      { y: 'b93a', t: 'Liverpool wins the Champions League after being 3-0 down at half-time' },
+      { y: 'b937', t: 'Beijing hosts the Summer Olympic Games' },
+      { y: 'b937', t: 'Lewis Hamilton wins his first Formula 1 world championship' },
+      { y: 'b933', t: 'London hosts the Summer Olympic Games' },
+      { y: 'b931', t: 'Germany wins the FIFA World Cup in Brazil' },
+      { y: 'b90f', t: 'Leicester City wins the Premier League at 5000-to-1 odds' },
+      { y: 'b90f', t: 'Rio de Janeiro hosts the Summer Olympic Games' },
+      { y: 'b90c', t: "England wins the Cricket World Cup at Lord's" },
+      { y: 'b90a', t: 'Tokyo hosts the Summer Olympic Games, delayed by a year' },
+      { y: 'b909', t: 'Argentina wins the FIFA World Cup in Qatar' },
+      { y: 'b907', t: 'Paris hosts the Summer Olympic Games' },
+
+      // Culture, film & TV
+      { y: 'b967', t: 'Mickey Mouse debuts in the animated short Steamboat Willie' },
+      { y: 'b94c', t: 'Disneyland opens its gates in Anaheim, California' },
+      { y: 'b943', t: 'The Beatles make their debut on The Ed Sullivan Show' },
+      { y: 'b95e', t: 'The Woodstock music festival is held in upstate New York' },
+      { y: 'b95c', t: 'Walt Disney World opens in Orlando, Florida' },
+      { y: 'b956', t: 'Star Wars debuts in cinemas' },
+      { y: 'b952', t: 'MTV launches in the United States' },
+      { y: 'b92e', t: 'The Live Aid concerts are held in London and Philadelphia' },
+      { y: 'b92a', t: 'The Simpsons premieres as its own series on Fox' },
+      { y: 'b925', t: 'The Channel Tunnel between England and France officially opens' },
+      { y: 'b925', t: 'Friends premieres on NBC' },
+      { y: 'b924', t: 'Pixar releases Toy Story, the first fully computer-animated feature film' },
+      { y: 'b922', t: "J.K. Rowling publishes Harry Potter and the Philosopher's Stone" },
+      { y: 'b922', t: 'Titanic is released in cinemas' },
+      { y: 'b920', t: 'The Matrix is released in cinemas' },
+      { y: 'b93e', t: "Harry Potter and the Philosopher's Stone film is released" },
+      { y: 'b93c', t: 'Peter Jackson releases Lord of the Rings: Return of the King in cinemas' },
+      { y: 'b937', t: 'Breaking Bad premieres on AMC' },
+      { y: 'b936', t: "James Cameron's Avatar is released in cinemas" },
+      { y: 'b934', t: 'Game of Thrones premieres on HBO' },
+      { y: 'b933', t: "Psy's Gangnam Style becomes the first YouTube video to hit a billion views" },
+      { y: 'b90f', t: 'Hamilton wins 11 Tony Awards on Broadway' },
+      { y: 'b90f', t: 'Pokémon Go launches and becomes a worldwide mobile phenomenon' },
+      { y: 'b90c', t: 'Avengers: Endgame is released, becoming a box-office phenomenon' },
+      { y: 'b90b', t: 'Parasite wins Best Picture at the Academy Awards' },
+      { y: 'b908', t: '"Barbenheimer" takes over cinemas as Barbie and Oppenheimer release on the same day' },
+    ];
 
     const MAX_WORDS = 20;
     const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -583,8 +889,7 @@
     const wordCount = (s) => (s || '').trim().split(/\s+/).filter(Boolean).length;
     const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    async function fetchAlbumPool() {
-      const artist = pick(ALBUM_ARTISTS);
+    async function fetchAlbumPool(artist) {
       const nArtist = normalize(artist);
       const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=album&attribute=artistTerm&limit=200`;
       try {
@@ -595,8 +900,14 @@
           if (!r.releaseDate || !r.collectionName || !r.artistName) return null;
           if (REISSUE_RE.test(r.collectionName)) return null;
           if (wordCount(r.collectionName) > MAX_WORDS) return null;
-          // Drop tribute / cover bands that sneak through artistTerm matching.
-          if (!normalize(r.artistName).includes(nArtist)) return null;
+          // Skip EPs and singles — we only want full-length albums.
+          if (NON_ALBUM_RE.test(r.collectionName)) return null;
+          if (r.collectionType && r.collectionType !== 'Album') return null;
+          if (typeof r.trackCount === 'number' && r.trackCount < 7) return null;
+          // Require an exact artist match — artistTerm is fuzzy and will return
+          // unrelated acts whose names happen to contain the search term (e.g.
+          // "Tupac Martir" when searching "Tupac").
+          if (normalize(r.artistName) !== nArtist) return null;
           const year = new Date(r.releaseDate).getUTCFullYear();
           if (year < MIN_YEAR || year > MAX_YEAR) return null;
           return {
@@ -637,47 +948,27 @@
       }
     }
 
-    async function fetchHistory() {
-      for (let attempt = 0; attempt < 8; attempt++) {
-        const month = Math.floor(Math.random() * 12) + 1;
-        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
-        const day = Math.floor(Math.random() * daysInMonth) + 1;
-        const mm = String(month).padStart(2, '0');
-        const dd = String(day).padStart(2, '0');
-        const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`;
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const data = await res.json();
-          const candidates = (data.events || []).filter(e =>
-            typeof e.year === 'number' &&
-            e.year >= MIN_YEAR && e.year <= MAX_YEAR &&
-            typeof e.text === 'string' &&
-            wordCount(e.text) <= MAX_WORDS
-          );
-          if (!candidates.length) continue;
-          const ev = candidates[Math.floor(Math.random() * candidates.length)];
-          return {
-            year: ev.year,
-            kind: 'history',
-            prompt: 'Historical event',
-            title: ev.text,
-            subtitle: `${new Date(2000, month - 1, day).toLocaleString('en-GB', { month: 'long' })} ${day}`,
-          };
-        } catch (e) {
-          /* keep trying */
-        }
-      }
-      return null;
+    function pickFamousEvents(n) {
+      return shuffle(FAMOUS_EVENTS).slice(0, n).map(e => ({
+        year: decodeYear(e.y),
+        kind: 'history',
+        prompt: 'Historical event',
+        title: e.t,
+        subtitle: '',
+      }));
     }
 
     async function buildGame(n = 10) {
       const albumCount = 4;
       const movieCount = 3;
 
-      // Fetch a handful of pools in parallel, each seeded with a different term, for variety.
-      const [a1, a2, a3, m1, m2, m3] = await Promise.all([
-        fetchAlbumPool(), fetchAlbumPool(), fetchAlbumPool(),
+      // Pick unique artists up front so a single game never repeats an artist.
+      // Fetch a few extra pools as a buffer in case any come back empty
+      // (e.g. iTunes returning no hits for a particular spelling).
+      const chosenArtists = shuffle(ALBUM_ARTISTS).slice(0, albumCount + 3);
+
+      const [albumPools, m1, m2, m3] = await Promise.all([
+        Promise.all(chosenArtists.map(fetchAlbumPool)),
         fetchMoviePool(), fetchMoviePool(), fetchMoviePool(),
       ]);
 
@@ -691,18 +982,79 @@
         });
       };
 
-      const albums = shuffle(dedupe([...a1, ...a2, ...a3])).slice(0, albumCount);
+      // One album per artist — skip pools that came back empty.
+      const albums = [];
+      for (const pool of albumPools) {
+        if (albums.length >= albumCount) break;
+        const pick = shuffle(pool)[0];
+        if (pick) albums.push(pick);
+      }
+
       const movies = shuffle(dedupe([...m1, ...m2, ...m3])).slice(0, movieCount);
 
       const historyNeeded = n - albums.length - movies.length;
-      const historyResults = [];
-      for (let i = 0; i < historyNeeded + 2 && historyResults.length < historyNeeded; i++) {
-        const h = await fetchHistory();
-        if (h && !historyResults.some(x => x.title === h.title)) historyResults.push(h);
-      }
+      const historyResults = pickFamousEvents(historyNeeded);
 
       const all = shuffle([...albums, ...movies, ...historyResults]).slice(0, n);
       return all;
+    }
+
+    const SCORES_KEY = 'whatYear.highScores.v1';
+    const SCORES_LIMIT = 10;
+
+    function loadScores() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(SCORES_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function recordScore(totalOff) {
+      const entry = { totalOff, date: new Date().toISOString() };
+      const scores = loadScores();
+      scores.push(entry);
+      scores.sort((a, b) => a.totalOff - b.totalOff);
+      const top = scores.slice(0, SCORES_LIMIT);
+      try {
+        localStorage.setItem(SCORES_KEY, JSON.stringify(top));
+      } catch (e) { /* storage unavailable — display still works from memory */ }
+      return { top, entry };
+    }
+
+    function renderScores(top, currentEntry) {
+      const list = $('#high-scores-list');
+      list.innerHTML = '';
+      if (!top.length) {
+        list.innerHTML = '<li class="empty">No scores yet — this one starts the board.</li>';
+        return;
+      }
+      const best = top[0].totalOff;
+      const fmt = new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+      top.forEach((s, i) => {
+        const li = document.createElement('li');
+        if (currentEntry && s.date === currentEntry.date && s.totalOff === currentEntry.totalOff) {
+          li.classList.add('current');
+        }
+        // Bar length shows relative score: best = 100%, worse = proportionally shorter.
+        const pct = ((best + 1) / (s.totalOff + 1)) * 100;
+        li.style.setProperty('--pct', pct.toFixed(1) + '%');
+        const rank = document.createElement('span');
+        rank.className = 'rank';
+        rank.textContent = `${i + 1}.`;
+        const score = document.createElement('span');
+        score.className = 'score';
+        score.textContent = `${s.totalOff} ${s.totalOff === 1 ? 'yr' : 'yrs'} off`;
+        const date = document.createElement('span');
+        date.className = 'date';
+        date.textContent = fmt.format(new Date(s.date));
+        li.append(rank, score, date);
+        list.appendChild(li);
+      });
     }
 
     function getFunFact(n) {
@@ -738,7 +1090,7 @@
 
       $('#reveal').classList.add('hidden');
       $('#guess-panel').style.display = '';
-      $('#submit-btn').disabled = false;
+      $('#submit-btn').disabled = true;
 
       // reset slider to a neutral starting point each question
       const slider = $('#year-slider');
@@ -804,6 +1156,8 @@
       show('#end-screen');
       $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
       $('#fun-fact-text').textContent = getFunFact(state.totalOff);
+      const { top, entry } = recordScore(state.totalOff);
+      renderScores(top, entry);
     }
 
     async function startGame() {
@@ -839,6 +1193,7 @@
       $('#next-btn').addEventListener('click', nextQuestion);
       $('#year-slider').addEventListener('input', (e) => {
         $('#year-value').textContent = e.target.value;
+        $('#submit-btn').disabled = false;
       });
 
       const slider = $('#year-slider');
