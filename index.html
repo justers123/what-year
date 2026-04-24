@@ -703,27 +703,6 @@
       margin: 8px 0;
     }
 
-    .fun-fact {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 18px 20px;
-      margin: 20px 0 24px;
-      font-size: 1rem;
-      line-height: 1.5;
-      text-align: left;
-      box-shadow: var(--shadow);
-    }
-
-    .fun-fact .label {
-      display: block;
-      color: var(--accent);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
     .recap-toggle {
       margin: 0 0 22px;
     }
@@ -1086,7 +1065,7 @@
     <section id="start-screen" class="screen active">
       <img class="app-logo" src="logo.svg" alt="" />
       <h1>What Year?</h1>
-      <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
+      <p class="tagline">Guess the year famous albums, films and historical events happened.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
       <button id="start-survival-btn" class="btn-secondary">100 years mode</button>
       <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 100 years.</p>
@@ -1164,10 +1143,6 @@
       <p id="perfect-message" class="perfect-message muted"></p>
       <button id="perfects-toggle" class="reveal-toggle perfects-toggle" type="button" hidden>Show which</button>
       <ul id="perfects-list" class="perfects-list" hidden></ul>
-      <div id="fun-fact" class="fun-fact">
-        <span class="label">Fun fact</span>
-        <span id="fun-fact-text">Loading...</span>
-      </div>
       <button id="recap-toggle" class="reveal-toggle recap-toggle" type="button">Show breakdown</button>
       <div id="recap" class="recap" hidden>
         <h3>This game</h3>
@@ -3999,13 +3974,6 @@
       modal.setAttribute('aria-hidden', 'true');
     }
 
-    function getFunFact(n) {
-      if (n === 0) return "Zero years, zero seconds — a perfect game. Are you a time traveller?";
-      const seconds = Math.round(n * 365.25 * 24 * 60 * 60);
-      const yearLabel = n === 1 ? 'year' : 'years';
-      return `${n} ${yearLabel} is about ${seconds.toLocaleString()} seconds.`;
-    }
-
     // ---- game state ----
     const state = {
       mode: 'classic', // or 'survival'
@@ -4317,7 +4285,6 @@
         const y = state.totalOff;
         $('#end-total').innerHTML = `You were off by <strong>${y} ${y === 1 ? 'year' : 'years'}</strong> across 10 guesses.`;
       }
-      $('#fun-fact-text').textContent = getFunFact(state.totalOff);
       renderPerfects();
       renderRecap();
       $('#recap').hidden = true;
