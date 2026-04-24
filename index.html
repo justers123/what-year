@@ -959,8 +959,8 @@
       <h1>What Year?</h1>
       <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
-      <button id="start-survival-btn" class="btn-secondary">200 years mode</button>
-      <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 200 years.</p>
+      <button id="start-survival-btn" class="btn-secondary">100 years mode</button>
+      <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 100 years.</p>
     </section>
 
     <section id="loading-screen" class="screen">
@@ -3736,8 +3736,8 @@
     }
 
     const SCORES_KEY = 'whatYear.highScores.v1';
-    const SURVIVAL_KEY = 'whatYear.survival.v1';
-    const SURVIVAL_LIMIT = 200;
+    const SURVIVAL_KEY = 'whatYear.survival.v2';
+    const SURVIVAL_LIMIT = 100;
     const SCORES_LIMIT = 10;
 
     function loadScoresFor(key) {
@@ -3781,7 +3781,7 @@
     function renderScores(top, currentEntry) {
       const isSurvival = state.mode === 'survival';
       const list = $('#high-scores-list');
-      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 200 years mode' : 'Top 10 best scores';
+      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 100 years mode' : 'Top 10 best scores';
       list.innerHTML = '';
       if (!top.length) {
         list.innerHTML = '<li class="empty">No scores yet — this one starts the board.</li>';
@@ -4135,7 +4135,7 @@
       if (isSurvival) {
         $('#end-heading').textContent = '💥 Boom!';
         const q = state.history.length;
-        $('#end-total').innerHTML = `You lasted <strong>${q} ${q === 1 ? 'question' : 'questions'}</strong> before hitting 200 years off.`;
+        $('#end-total').innerHTML = `You lasted <strong>${q} ${q === 1 ? 'question' : 'questions'}</strong> before hitting 100 years off.`;
       } else {
         $('#end-heading').textContent = 'Game over';
         const y = state.totalOff;
