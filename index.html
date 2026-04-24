@@ -145,6 +145,34 @@
       transform: none;
     }
 
+    .btn-secondary {
+      appearance: none;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--fg);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 12px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(255, 203, 71, 0.05);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .mode-blurb {
+      margin: 18px auto 0;
+      font-size: 0.85rem;
+      max-width: 360px;
+      line-height: 1.5;
+    }
+
     .spinner {
       width: 48px;
       height: 48px;
@@ -183,6 +211,47 @@
       font-size: 0.9rem;
       margin-bottom: 12px;
       font-variant-numeric: tabular-nums;
+    }
+
+    .survival-banner {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 16px;
+      padding: 7px 16px;
+      text-align: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(255, 203, 71, 0.08);
+      border: 1px solid rgba(255, 203, 71, 0.3);
+      border-radius: 999px;
+    }
+
+    .survival-banner[hidden] {
+      display: none;
+    }
+
+    .survival-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .survival-bar[hidden] {
+      display: none;
+    }
+
+    .survival-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
     }
 
     .q-card {
@@ -417,6 +486,131 @@
       width: 100%;
     }
 
+    /* explosion overlay for survival mode */
+    .explosion-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .explosion-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%,
+          rgba(255, 203, 71, 0.85) 0%,
+          rgba(255, 122, 198, 0.45) 30%,
+          transparent 60%);
+      opacity: 0;
+      animation: explosion-flash 1s ease-out forwards;
+    }
+
+    @keyframes explosion-flash {
+      0% {
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .explosion-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      margin: -30px 0 0 -30px;
+      border: 6px solid var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: explosion-ring 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes explosion-ring {
+      0% {
+        transform: scale(0.3);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(30);
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    .explosion-particle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(255, 203, 71, 0.4);
+      animation: explosion-particle 1.4s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+    }
+
+    @keyframes explosion-particle {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2);
+        opacity: 0;
+      }
+    }
+
+    .explosion-text {
+      position: relative;
+      font-size: clamp(3rem, 14vw, 6rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      opacity: 0;
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+      animation: explosion-text 1.5s cubic-bezier(0.3, 1.6, 0.6, 1) forwards;
+    }
+
+    @keyframes explosion-text {
+      0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(-8deg);
+      }
+
+      25% {
+        opacity: 1;
+        transform: scale(1.2) rotate(4deg);
+      }
+
+      45% {
+        transform: scale(0.95) rotate(-2deg);
+      }
+
+      70% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.1);
+      }
+    }
+
     /* celebration / reaction */
     .confetti-container {
       position: fixed;
@@ -579,7 +773,7 @@
       padding: 8px 0;
     }
 
-    .perfects-list li + li {
+    .perfects-list li+li {
       border-top: 1px solid var(--card-border);
     }
 
@@ -627,7 +821,7 @@
       background: rgba(255, 255, 255, 0.03);
     }
 
-    .recap li + li {
+    .recap li+li {
       margin-top: 4px;
     }
 
@@ -694,7 +888,7 @@
       overflow: hidden;
     }
 
-    .high-scores li + li {
+    .high-scores li+li {
       margin-top: 4px;
     }
 
@@ -708,7 +902,7 @@
       transition: width 0.4s ease;
     }
 
-    .high-scores li > * {
+    .high-scores li>* {
       position: relative;
       z-index: 1;
     }
@@ -765,6 +959,8 @@
       <h1>What Year?</h1>
       <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
+      <button id="start-survival-btn" class="btn-secondary">200 years mode</button>
+      <p class="mode-blurb muted">10-question quiz · or survive as long as you can before racking up 200 years off the correct year.</p>
     </section>
 
     <section id="loading-screen" class="screen">
@@ -773,8 +969,12 @@
     </section>
 
     <section id="question-screen" class="screen">
+      <div id="survival-banner" class="survival-banner" hidden>💥 Survive as long as you can</div>
       <div class="q-header">
         <span id="q-counter">Question 1 of 10</span>
+      </div>
+      <div id="survival-bar" class="survival-bar" hidden aria-hidden="true">
+        <div id="survival-bar-fill" class="survival-bar-fill"></div>
       </div>
 
       <div class="q-card">
@@ -828,9 +1028,9 @@
     </section>
 
     <section id="end-screen" class="screen">
-      <h1>Game over</h1>
-      <p class="total">You were off by<strong id="total-years">0 years</strong>across 10 guesses.</p>
-      <p class="perfect-stat"><strong id="perfect-count">0</strong>out of 10 exactly right.</p>
+      <h1 id="end-heading">Game over</h1>
+      <p class="total" id="end-total">You were off by <strong>0 years</strong> across 10 guesses.</p>
+      <p class="perfect-stat"><strong id="perfect-count">0</strong>out of <span id="perfect-total">10</span> exactly right.</p>
       <p id="perfect-message" class="perfect-message muted"></p>
       <button id="perfects-toggle" class="reveal-toggle perfects-toggle" type="button" hidden>Show which</button>
       <ul id="perfects-list" class="perfects-list" hidden></ul>
@@ -844,7 +1044,7 @@
         <ol id="recap-list"></ol>
       </div>
       <div id="high-scores" class="high-scores">
-        <h3>Top 10 best scores</h3>
+        <h3 id="high-scores-title">Top 10 best scores</h3>
         <ol id="high-scores-list"></ol>
       </div>
       <button id="replay-btn" class="btn-primary">Play again</button>
@@ -1067,637 +1267,2350 @@
 
     const FAMOUS_EVENTS = [
       // Space & science
-      { y: 'b94a', t: 'The Soviet Union launches Sputnik, the first artificial satellite' },
-      { y: 'b949', t: 'The United States establishes NASA as its space agency' },
-      { y: 'b946', t: 'Yuri Gagarin becomes the first human to travel into outer space' },
-      { y: 'b945', t: 'John Glenn becomes the first American to orbit the Earth' },
-      { y: 'b944', t: 'Valentina Tereshkova becomes the first woman in space' },
-      { y: 'b95e', t: 'Neil Armstrong and Buzz Aldrin walk on the Moon during Apollo 11' },
-      { y: 'b95d', t: 'The Apollo 13 crew returns safely to Earth after an in-flight emergency' },
-      { y: 'b95b', t: 'Apollo 17 carries the final crewed mission to the Moon' },
-      { y: 'b956', t: 'NASA launches the Voyager 1 space probe' },
-      { y: 'b952', t: 'The first Space Shuttle, Columbia, launches into orbit' },
-      { y: 'b950', t: 'Sally Ride becomes the first American woman in space' },
-      { y: 'b929', t: 'The Hubble Space Telescope is launched into orbit' },
-      { y: 'b923', t: 'Dolly the sheep, the first cloned mammal, is born in Scotland' },
-      { y: 'b921', t: 'Construction begins on the International Space Station' },
-      { y: 'b939', t: 'Pluto is officially reclassified as a dwarf planet' },
-      { y: 'b937', t: 'The Large Hadron Collider is switched on for the first time at CERN' },
-      { y: 'b933', t: "NASA's Curiosity rover successfully lands on Mars" },
-      { y: 'b933', t: 'The discovery of the Higgs boson is announced at CERN' },
-      { y: 'b933', t: 'Felix Baumgartner free-falls from the edge of space' },
-      { y: 'b930', t: "NASA's New Horizons spacecraft flies by Pluto" },
-      { y: 'b90b', t: "SpaceX's Crew Dragon carries the first commercial astronauts to orbit" },
-      { y: 'b90a', t: "NASA's Perseverance rover lands on Mars" },
-      { y: 'b90a', t: 'The James Webb Space Telescope is launched into space' },
+      {
+        y: 'b94a',
+        t: 'The Soviet Union launches Sputnik, the first artificial satellite'
+      },
+      {
+        y: 'b949',
+        t: 'The United States establishes NASA as its space agency'
+      },
+      {
+        y: 'b946',
+        t: 'Yuri Gagarin becomes the first human to travel into outer space'
+      },
+      {
+        y: 'b945',
+        t: 'John Glenn becomes the first American to orbit the Earth'
+      },
+      {
+        y: 'b944',
+        t: 'Valentina Tereshkova becomes the first woman in space'
+      },
+      {
+        y: 'b95e',
+        t: 'Neil Armstrong and Buzz Aldrin walk on the Moon during Apollo 11'
+      },
+      {
+        y: 'b95d',
+        t: 'The Apollo 13 crew returns safely to Earth after an in-flight emergency'
+      },
+      {
+        y: 'b95b',
+        t: 'Apollo 17 carries the final crewed mission to the Moon'
+      },
+      {
+        y: 'b956',
+        t: 'NASA launches the Voyager 1 space probe'
+      },
+      {
+        y: 'b952',
+        t: 'The first Space Shuttle, Columbia, launches into orbit'
+      },
+      {
+        y: 'b950',
+        t: 'Sally Ride becomes the first American woman in space'
+      },
+      {
+        y: 'b929',
+        t: 'The Hubble Space Telescope is launched into orbit'
+      },
+      {
+        y: 'b923',
+        t: 'Dolly the sheep, the first cloned mammal, is born in Scotland'
+      },
+      {
+        y: 'b921',
+        t: 'Construction begins on the International Space Station'
+      },
+      {
+        y: 'b939',
+        t: 'Pluto is officially reclassified as a dwarf planet'
+      },
+      {
+        y: 'b937',
+        t: 'The Large Hadron Collider is switched on for the first time at CERN'
+      },
+      {
+        y: 'b933',
+        t: "NASA's Curiosity rover successfully lands on Mars"
+      },
+      {
+        y: 'b933',
+        t: 'The discovery of the Higgs boson is announced at CERN'
+      },
+      {
+        y: 'b933',
+        t: 'Felix Baumgartner free-falls from the edge of space'
+      },
+      {
+        y: 'b930',
+        t: "NASA's New Horizons spacecraft flies by Pluto"
+      },
+      {
+        y: 'b90b',
+        t: "SpaceX's Crew Dragon carries the first commercial astronauts to orbit"
+      },
+      {
+        y: 'b90a',
+        t: "NASA's Perseverance rover lands on Mars"
+      },
+      {
+        y: 'b90a',
+        t: 'The James Webb Space Telescope is launched into space'
+      },
 
       // British royals & UK politics
-      { y: 'b94e', t: 'Queen Elizabeth II is crowned at Westminster Abbey' },
-      { y: 'b95e', t: 'Charles is invested as the Prince of Wales at Caernarfon Castle' },
-      { y: 'b956', t: 'The UK celebrates the Silver Jubilee of Queen Elizabeth II' },
-      { y: 'b954', t: "Margaret Thatcher becomes Britain's first female Prime Minister" },
-      { y: 'b952', t: "Prince Charles marries Lady Diana Spencer at St Paul's Cathedral" },
-      { y: 'b929', t: 'Margaret Thatcher resigns as UK Prime Minister' },
-      { y: 'b922', t: 'Tony Blair becomes Prime Minister after a Labour landslide' },
-      { y: 'b935', t: 'David Cameron becomes UK Prime Minister in a coalition government' },
-      { y: 'b934', t: 'Prince William marries Catherine Middleton at Westminster Abbey' },
-      { y: 'b933', t: 'The UK celebrates the Diamond Jubilee of Queen Elizabeth II' },
-      { y: 'b932', t: 'Prince George, son of William and Catherine, is born' },
-      { y: 'b90f', t: 'The United Kingdom votes to leave the European Union' },
-      { y: 'b90f', t: 'Theresa May becomes UK Prime Minister after the Brexit vote' },
-      { y: 'b90d', t: 'Prince Harry marries Meghan Markle at Windsor Castle' },
-      { y: 'b90c', t: 'Boris Johnson becomes UK Prime Minister' },
-      { y: 'b909', t: 'Rishi Sunak becomes the first British Asian Prime Minister' },
-      { y: 'b908', t: 'King Charles III is crowned at Westminster Abbey' },
-      { y: 'b907', t: 'Keir Starmer leads Labour to a landslide UK general election victory' },
+      {
+        y: 'b94e',
+        t: 'Queen Elizabeth II is crowned at Westminster Abbey'
+      },
+      {
+        y: 'b95e',
+        t: 'Charles is invested as the Prince of Wales at Caernarfon Castle'
+      },
+      {
+        y: 'b956',
+        t: 'The UK celebrates the Silver Jubilee of Queen Elizabeth II'
+      },
+      {
+        y: 'b954',
+        t: "Margaret Thatcher becomes Britain's first female Prime Minister"
+      },
+      {
+        y: 'b952',
+        t: "Prince Charles marries Lady Diana Spencer at St Paul's Cathedral"
+      },
+      {
+        y: 'b929',
+        t: 'Margaret Thatcher resigns as UK Prime Minister'
+      },
+      {
+        y: 'b922',
+        t: 'Tony Blair becomes Prime Minister after a Labour landslide'
+      },
+      {
+        y: 'b935',
+        t: 'David Cameron becomes UK Prime Minister in a coalition government'
+      },
+      {
+        y: 'b934',
+        t: 'Prince William marries Catherine Middleton at Westminster Abbey'
+      },
+      {
+        y: 'b933',
+        t: 'The UK celebrates the Diamond Jubilee of Queen Elizabeth II'
+      },
+      {
+        y: 'b932',
+        t: 'Prince George, son of William and Catherine, is born'
+      },
+      {
+        y: 'b90f',
+        t: 'The United Kingdom votes to leave the European Union'
+      },
+      {
+        y: 'b90f',
+        t: 'Theresa May becomes UK Prime Minister after the Brexit vote'
+      },
+      {
+        y: 'b90d',
+        t: 'Prince Harry marries Meghan Markle at Windsor Castle'
+      },
+      {
+        y: 'b90c',
+        t: 'Boris Johnson becomes UK Prime Minister'
+      },
+      {
+        y: 'b909',
+        t: 'Rishi Sunak becomes the first British Asian Prime Minister'
+      },
+      {
+        y: 'b908',
+        t: 'King Charles III is crowned at Westminster Abbey'
+      },
+      {
+        y: 'b907',
+        t: 'Keir Starmer leads Labour to a landslide UK general election victory'
+      },
 
       // World politics & landmark events
-      { y: 'b944', t: 'Martin Luther King Jr. delivers his "I Have a Dream" speech in Washington' },
-      { y: 'b953', t: 'Ronald Reagan is elected President of the United States' },
-      { y: 'b92a', t: 'The Berlin Wall falls, opening the border between East and West Germany' },
-      { y: 'b929', t: 'Nelson Mandela is released from prison after 27 years' },
-      { y: 'b928', t: 'The Soviet Union is formally dissolved' },
-      { y: 'b927', t: 'Bill Clinton is elected President of the United States' },
-      { y: 'b926', t: 'The European Union is established under the Maastricht Treaty' },
-      { y: 'b925', t: 'Nelson Mandela is inaugurated as President of South Africa' },
-      { y: 'b922', t: 'The United Kingdom hands Hong Kong back to China' },
-      { y: 'b920', t: 'The Euro is introduced as an official European currency' },
-      { y: 'b937', t: 'Barack Obama is elected the first Black President of the United States' },
-      { y: 'b932', t: 'Pope Francis is elected as the first Jesuit Pope' },
-      { y: 'b930', t: 'Ireland legalises same-sex marriage by popular vote' },
-      { y: 'b930', t: 'The US Supreme Court legalises same-sex marriage nationwide' },
-      { y: 'b90f', t: 'Donald Trump is elected President of the United States' },
-      { y: 'b90e', t: 'Emmanuel Macron is elected President of France' },
-      { y: 'b90b', t: 'Joe Biden is elected President of the United States' },
-      { y: 'b907', t: 'Donald Trump is elected to a second term as US President' },
+      {
+        y: 'b944',
+        t: 'Martin Luther King Jr. delivers his "I Have a Dream" speech in Washington'
+      },
+      {
+        y: 'b953',
+        t: 'Ronald Reagan is elected President of the United States'
+      },
+      {
+        y: 'b92a',
+        t: 'The Berlin Wall falls, opening the border between East and West Germany'
+      },
+      {
+        y: 'b929',
+        t: 'Nelson Mandela is released from prison after 27 years'
+      },
+      {
+        y: 'b928',
+        t: 'The Soviet Union is formally dissolved'
+      },
+      {
+        y: 'b927',
+        t: 'Bill Clinton is elected President of the United States'
+      },
+      {
+        y: 'b926',
+        t: 'The European Union is established under the Maastricht Treaty'
+      },
+      {
+        y: 'b925',
+        t: 'Nelson Mandela is inaugurated as President of South Africa'
+      },
+      {
+        y: 'b922',
+        t: 'The United Kingdom hands Hong Kong back to China'
+      },
+      {
+        y: 'b920',
+        t: 'The Euro is introduced as an official European currency'
+      },
+      {
+        y: 'b937',
+        t: 'Barack Obama is elected the first Black President of the United States'
+      },
+      {
+        y: 'b932',
+        t: 'Pope Francis is elected as the first Jesuit Pope'
+      },
+      {
+        y: 'b930',
+        t: 'Ireland legalises same-sex marriage by popular vote'
+      },
+      {
+        y: 'b930',
+        t: 'The US Supreme Court legalises same-sex marriage nationwide'
+      },
+      {
+        y: 'b90f',
+        t: 'Donald Trump is elected President of the United States'
+      },
+      {
+        y: 'b90e',
+        t: 'Emmanuel Macron is elected President of France'
+      },
+      {
+        y: 'b90b',
+        t: 'Joe Biden is elected President of the United States'
+      },
+      {
+        y: 'b907',
+        t: 'Donald Trump is elected to a second term as US President'
+      },
 
       // Technology
-      { y: 'b958', t: 'Bill Gates and Paul Allen found Microsoft' },
-      { y: 'b957', t: 'Steve Jobs and Steve Wozniak found Apple' },
-      { y: 'b954', t: 'Sony launches the Walkman personal stereo' },
-      { y: 'b952', t: 'IBM introduces its first personal computer' },
-      { y: 'b92f', t: 'Apple introduces the original Macintosh computer' },
-      { y: 'b92e', t: 'Nintendo launches the Nintendo Entertainment System in North America' },
-      { y: 'b92a', t: 'Tim Berners-Lee proposes what becomes the World Wide Web' },
-      { y: 'b92a', t: 'Nintendo releases the Game Boy handheld console' },
-      { y: 'b925', t: 'Sony releases the original PlayStation in Japan' },
-      { y: 'b924', t: 'Microsoft releases Windows 95' },
-      { y: 'b923', t: 'Bandai launches the Tamagotchi virtual pet' },
-      { y: 'b922', t: "IBM's Deep Blue defeats world chess champion Garry Kasparov" },
-      { y: 'b921', t: 'Larry Page and Sergey Brin found Google' },
-      { y: 'b93f', t: 'Sony releases the PlayStation 2' },
-      { y: 'b93e', t: 'Apple releases the first iPod' },
-      { y: 'b93e', t: 'Wikipedia is launched' },
-      { y: 'b93b', t: 'Mark Zuckerberg launches Facebook from his Harvard dorm room' },
-      { y: 'b93a', t: 'YouTube is founded in a garage in California' },
-      { y: 'b939', t: 'Twitter is launched' },
-      { y: 'b938', t: 'Apple releases the first iPhone' },
-      { y: 'b936', t: 'Bitcoin is launched as the first cryptocurrency' },
-      { y: 'b935', t: 'Apple releases the first iPad' },
-      { y: 'b935', t: 'Instagram is launched' },
-      { y: 'b934', t: 'Apple introduces Siri on the iPhone 4S' },
-      { y: 'b930', t: 'Apple releases the first Apple Watch' },
-      { y: 'b90e', t: 'Nintendo releases the Switch console' },
-      { y: 'b909', t: 'OpenAI releases ChatGPT to the public' },
+      {
+        y: 'b958',
+        t: 'Bill Gates and Paul Allen found Microsoft'
+      },
+      {
+        y: 'b957',
+        t: 'Steve Jobs and Steve Wozniak found Apple'
+      },
+      {
+        y: 'b954',
+        t: 'Sony launches the Walkman personal stereo'
+      },
+      {
+        y: 'b952',
+        t: 'IBM introduces its first personal computer'
+      },
+      {
+        y: 'b92f',
+        t: 'Apple introduces the original Macintosh computer'
+      },
+      {
+        y: 'b92e',
+        t: 'Nintendo launches the Nintendo Entertainment System in North America'
+      },
+      {
+        y: 'b92a',
+        t: 'Tim Berners-Lee proposes what becomes the World Wide Web'
+      },
+      {
+        y: 'b92a',
+        t: 'Nintendo releases the Game Boy handheld console'
+      },
+      {
+        y: 'b925',
+        t: 'Sony releases the original PlayStation in Japan'
+      },
+      {
+        y: 'b924',
+        t: 'Microsoft releases Windows 95'
+      },
+      {
+        y: 'b923',
+        t: 'Bandai launches the Tamagotchi virtual pet'
+      },
+      {
+        y: 'b922',
+        t: "IBM's Deep Blue defeats world chess champion Garry Kasparov"
+      },
+      {
+        y: 'b921',
+        t: 'Larry Page and Sergey Brin found Google'
+      },
+      {
+        y: 'b93f',
+        t: 'Sony releases the PlayStation 2'
+      },
+      {
+        y: 'b93e',
+        t: 'Apple releases the first iPod'
+      },
+      {
+        y: 'b93e',
+        t: 'Wikipedia is launched'
+      },
+      {
+        y: 'b93b',
+        t: 'Mark Zuckerberg launches Facebook from his Harvard dorm room'
+      },
+      {
+        y: 'b93a',
+        t: 'YouTube is founded in a garage in California'
+      },
+      {
+        y: 'b939',
+        t: 'Twitter is launched'
+      },
+      {
+        y: 'b938',
+        t: 'Apple releases the first iPhone'
+      },
+      {
+        y: 'b936',
+        t: 'Bitcoin is launched as the first cryptocurrency'
+      },
+      {
+        y: 'b935',
+        t: 'Apple releases the first iPad'
+      },
+      {
+        y: 'b935',
+        t: 'Instagram is launched'
+      },
+      {
+        y: 'b934',
+        t: 'Apple introduces Siri on the iPhone 4S'
+      },
+      {
+        y: 'b930',
+        t: 'Apple releases the first Apple Watch'
+      },
+      {
+        y: 'b90e',
+        t: 'Nintendo releases the Switch console'
+      },
+      {
+        y: 'b909',
+        t: 'OpenAI releases ChatGPT to the public'
+      },
 
       // Sport
-      { y: 'b941', t: 'England wins the FIFA World Cup, beating West Germany at Wembley' },
-      { y: 'b95f', t: 'Mexico City hosts the Summer Olympic Games' },
-      { y: 'b953', t: 'The US ice hockey team beats the Soviet Union in the "Miracle on Ice"' },
-      { y: 'b92f', t: 'Los Angeles hosts the Summer Olympic Games' },
-      { y: 'b92b', t: 'Seoul hosts the Summer Olympic Games' },
-      { y: 'b927', t: 'Barcelona hosts the Summer Olympic Games' },
-      { y: 'b923', t: 'Atlanta hosts the Summer Olympic Games' },
-      { y: 'b923', t: 'England hosts the Euro 96 football championship' },
-      { y: 'b922', t: 'Tiger Woods wins his first Masters at age 21' },
-      { y: 'b921', t: 'France hosts and wins the FIFA World Cup' },
-      { y: 'b920', t: 'Manchester United completes a historic treble' },
-      { y: 'b93f', t: 'Sydney hosts the Summer Olympic Games' },
-      { y: 'b93c', t: 'England wins the Rugby World Cup in Australia' },
-      { y: 'b93b', t: 'Athens hosts the Summer Olympic Games' },
-      { y: 'b93a', t: 'Liverpool wins the Champions League after being 3-0 down at half-time' },
-      { y: 'b937', t: 'Beijing hosts the Summer Olympic Games' },
-      { y: 'b937', t: 'Lewis Hamilton wins his first Formula 1 world championship' },
-      { y: 'b933', t: 'London hosts the Summer Olympic Games' },
-      { y: 'b931', t: 'Germany wins the FIFA World Cup in Brazil' },
-      { y: 'b90f', t: 'Leicester City wins the Premier League at 5000-to-1 odds' },
-      { y: 'b90f', t: 'Rio de Janeiro hosts the Summer Olympic Games' },
-      { y: 'b90c', t: "England wins the Cricket World Cup at Lord's" },
-      { y: 'b90a', t: 'Tokyo hosts the Summer Olympic Games, delayed by a year' },
-      { y: 'b909', t: 'Argentina wins the FIFA World Cup in Qatar' },
-      { y: 'b907', t: 'Paris hosts the Summer Olympic Games' },
+      {
+        y: 'b941',
+        t: 'England wins the FIFA World Cup, beating West Germany at Wembley'
+      },
+      {
+        y: 'b95f',
+        t: 'Mexico City hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b953',
+        t: 'The US ice hockey team beats the Soviet Union in the "Miracle on Ice"'
+      },
+      {
+        y: 'b92f',
+        t: 'Los Angeles hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b92b',
+        t: 'Seoul hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b927',
+        t: 'Barcelona hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b923',
+        t: 'Atlanta hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b923',
+        t: 'England hosts the Euro 96 football championship'
+      },
+      {
+        y: 'b922',
+        t: 'Tiger Woods wins his first Masters at age 21'
+      },
+      {
+        y: 'b921',
+        t: 'France hosts and wins the FIFA World Cup'
+      },
+      {
+        y: 'b920',
+        t: 'Manchester United completes a historic treble'
+      },
+      {
+        y: 'b93f',
+        t: 'Sydney hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b93c',
+        t: 'England wins the Rugby World Cup in Australia'
+      },
+      {
+        y: 'b93b',
+        t: 'Athens hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b93a',
+        t: 'Liverpool wins the Champions League after being 3-0 down at half-time'
+      },
+      {
+        y: 'b937',
+        t: 'Beijing hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b937',
+        t: 'Lewis Hamilton wins his first Formula 1 world championship'
+      },
+      {
+        y: 'b933',
+        t: 'London hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b931',
+        t: 'Germany wins the FIFA World Cup in Brazil'
+      },
+      {
+        y: 'b90f',
+        t: 'Leicester City wins the Premier League at 5000-to-1 odds'
+      },
+      {
+        y: 'b90f',
+        t: 'Rio de Janeiro hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b90c',
+        t: "England wins the Cricket World Cup at Lord's"
+      },
+      {
+        y: 'b90a',
+        t: 'Tokyo hosts the Summer Olympic Games, delayed by a year'
+      },
+      {
+        y: 'b909',
+        t: 'Argentina wins the FIFA World Cup in Qatar'
+      },
+      {
+        y: 'b907',
+        t: 'Paris hosts the Summer Olympic Games'
+      },
 
       // Culture, film & TV
-      { y: 'b967', t: 'Mickey Mouse debuts in the animated short Steamboat Willie' },
-      { y: 'b94c', t: 'Disneyland opens its gates in Anaheim, California' },
-      { y: 'b943', t: 'The Beatles make their debut on The Ed Sullivan Show' },
-      { y: 'b95e', t: 'The Woodstock music festival is held in upstate New York' },
-      { y: 'b95c', t: 'Walt Disney World opens in Orlando, Florida' },
-      { y: 'b956', t: 'Star Wars debuts in cinemas' },
-      { y: 'b952', t: 'MTV launches in the United States' },
-      { y: 'b92e', t: 'The Live Aid concerts are held in London and Philadelphia' },
-      { y: 'b92a', t: 'The Simpsons premieres as its own series on Fox' },
-      { y: 'b925', t: 'The Channel Tunnel between England and France officially opens' },
-      { y: 'b925', t: 'Friends premieres on NBC' },
-      { y: 'b924', t: 'Pixar releases Toy Story, the first fully computer-animated feature film' },
-      { y: 'b922', t: "J.K. Rowling publishes Harry Potter and the Philosopher's Stone" },
-      { y: 'b922', t: 'Titanic is released in cinemas' },
-      { y: 'b920', t: 'The Matrix is released in cinemas' },
-      { y: 'b93e', t: "Harry Potter and the Philosopher's Stone film is released" },
-      { y: 'b93c', t: 'Peter Jackson releases Lord of the Rings: Return of the King in cinemas' },
-      { y: 'b937', t: 'Breaking Bad premieres on AMC' },
-      { y: 'b936', t: "James Cameron's Avatar is released in cinemas" },
-      { y: 'b934', t: 'Game of Thrones premieres on HBO' },
-      { y: 'b933', t: "Psy's Gangnam Style becomes the first YouTube video to hit a billion views" },
-      { y: 'b90f', t: 'Hamilton wins 11 Tony Awards on Broadway' },
-      { y: 'b90f', t: 'Pokémon Go launches and becomes a worldwide mobile phenomenon' },
-      { y: 'b90c', t: 'Avengers: Endgame is released, becoming a box-office phenomenon' },
-      { y: 'b90b', t: 'Parasite wins Best Picture at the Academy Awards' },
-      { y: 'b908', t: '"Barbenheimer" takes over cinemas as Barbie and Oppenheimer release on the same day' },
+      {
+        y: 'b967',
+        t: 'Mickey Mouse debuts in the animated short Steamboat Willie'
+      },
+      {
+        y: 'b94c',
+        t: 'Disneyland opens its gates in Anaheim, California'
+      },
+      {
+        y: 'b943',
+        t: 'The Beatles make their debut on The Ed Sullivan Show'
+      },
+      {
+        y: 'b95e',
+        t: 'The Woodstock music festival is held in upstate New York'
+      },
+      {
+        y: 'b95c',
+        t: 'Walt Disney World opens in Orlando, Florida'
+      },
+      {
+        y: 'b956',
+        t: 'Star Wars debuts in cinemas'
+      },
+      {
+        y: 'b952',
+        t: 'MTV launches in the United States'
+      },
+      {
+        y: 'b92e',
+        t: 'The Live Aid concerts are held in London and Philadelphia'
+      },
+      {
+        y: 'b92a',
+        t: 'The Simpsons premieres as its own series on Fox'
+      },
+      {
+        y: 'b925',
+        t: 'The Channel Tunnel between England and France officially opens'
+      },
+      {
+        y: 'b925',
+        t: 'Friends premieres on NBC'
+      },
+      {
+        y: 'b924',
+        t: 'Pixar releases Toy Story, the first fully computer-animated feature film'
+      },
+      {
+        y: 'b922',
+        t: "J.K. Rowling publishes Harry Potter and the Philosopher's Stone"
+      },
+      {
+        y: 'b922',
+        t: 'Titanic is released in cinemas'
+      },
+      {
+        y: 'b920',
+        t: 'The Matrix is released in cinemas'
+      },
+      {
+        y: 'b93e',
+        t: "Harry Potter and the Philosopher's Stone film is released"
+      },
+      {
+        y: 'b93c',
+        t: 'Peter Jackson releases Lord of the Rings: Return of the King in cinemas'
+      },
+      {
+        y: 'b937',
+        t: 'Breaking Bad premieres on AMC'
+      },
+      {
+        y: 'b936',
+        t: "James Cameron's Avatar is released in cinemas"
+      },
+      {
+        y: 'b934',
+        t: 'Game of Thrones premieres on HBO'
+      },
+      {
+        y: 'b933',
+        t: "Psy's Gangnam Style becomes the first YouTube video to hit a billion views"
+      },
+      {
+        y: 'b90f',
+        t: 'Hamilton wins 11 Tony Awards on Broadway'
+      },
+      {
+        y: 'b90f',
+        t: 'Pokémon Go launches and becomes a worldwide mobile phenomenon'
+      },
+      {
+        y: 'b90c',
+        t: 'Avengers: Endgame is released, becoming a box-office phenomenon'
+      },
+      {
+        y: 'b90b',
+        t: 'Parasite wins Best Picture at the Academy Awards'
+      },
+      {
+        y: 'b908',
+        t: '"Barbenheimer" takes over cinemas as Barbie and Oppenheimer release on the same day'
+      },
 
       // More science & discovery
-      { y: 'b967', t: 'Alexander Fleming discovers penicillin' },
-      { y: 'b94e', t: 'James Watson and Francis Crick publish the structure of DNA' },
-      { y: 'b947', t: 'The oral contraceptive pill is approved by the US FDA' },
-      { y: 'b940', t: 'Christiaan Barnard performs the first successful human heart transplant' },
-      { y: 'b955', t: 'Louise Brown is born, the world\'s first "test tube baby"' },
-      { y: 'b95e', t: 'ARPANET, the forerunner of the Internet, sends its first message' },
-      { y: 'b95a', t: 'NASA launches the Skylab space station' },
-      { y: 'b957', t: 'Viking 1 becomes the first spacecraft to successfully land on Mars' },
-      { y: 'b92a', t: 'Voyager 2 completes its grand tour of the outer planets' },
-      { y: 'b93c', t: 'The Human Genome Project is completed' },
-      { y: 'b90d', t: "SpaceX launches Falcon Heavy with Elon Musk's Tesla Roadster as payload" },
-      { y: 'b90c', t: 'The first image of a black hole is released by the Event Horizon Telescope' },
+      {
+        y: 'b967',
+        t: 'Alexander Fleming discovers penicillin'
+      },
+      {
+        y: 'b94e',
+        t: 'James Watson and Francis Crick publish the structure of DNA'
+      },
+      {
+        y: 'b947',
+        t: 'The oral contraceptive pill is approved by the US FDA'
+      },
+      {
+        y: 'b940',
+        t: 'Christiaan Barnard performs the first successful human heart transplant'
+      },
+      {
+        y: 'b955',
+        t: 'Louise Brown is born, the world\'s first "test tube baby"'
+      },
+      {
+        y: 'b95e',
+        t: 'ARPANET, the forerunner of the Internet, sends its first message'
+      },
+      {
+        y: 'b95a',
+        t: 'NASA launches the Skylab space station'
+      },
+      {
+        y: 'b957',
+        t: 'Viking 1 becomes the first spacecraft to successfully land on Mars'
+      },
+      {
+        y: 'b92a',
+        t: 'Voyager 2 completes its grand tour of the outer planets'
+      },
+      {
+        y: 'b93c',
+        t: 'The Human Genome Project is completed'
+      },
+      {
+        y: 'b90d',
+        t: "SpaceX launches Falcon Heavy with Elon Musk's Tesla Roadster as payload"
+      },
+      {
+        y: 'b90c',
+        t: 'The first image of a black hole is released by the Event Horizon Telescope'
+      },
 
       // More technology
-      { y: 'b956', t: 'Apple releases the Apple II personal computer' },
-      { y: 'b951', t: 'Time magazine names the personal computer "Machine of the Year"' },
-      { y: 'b928', t: 'Linus Torvalds releases the first version of the Linux kernel' },
-      { y: 'b926', t: 'The Mosaic web browser is released, popularising the internet' },
-      { y: 'b925', t: 'Jeff Bezos founds Amazon.com in a Seattle garage' },
-      { y: 'b924', t: 'eBay is founded in California' },
-      { y: 'b93c', t: 'Apple launches the iTunes Music Store' },
-      { y: 'b93b', t: 'Google launches Gmail' },
-      { y: 'b939', t: 'Nintendo launches the Wii console' },
-      { y: 'b938', t: 'Amazon releases the Kindle e-reader' },
-      { y: 'b938', t: 'Netflix launches its video streaming service' },
-      { y: 'b937', t: 'Spotify launches its music service in Sweden' },
-      { y: 'b934', t: 'Spotify launches in the United States' },
-      { y: 'b931', t: 'Amazon releases the Echo smart speaker with Alexa' },
-      { y: 'b931', t: 'Facebook acquires WhatsApp' },
-      { y: 'b930', t: 'Apple Music is launched' },
-      { y: 'b90c', t: 'Disney+ launches as a streaming service' },
-      { y: 'b909', t: 'Elon Musk completes his acquisition of Twitter' },
-      { y: 'b908', t: 'Twitter is rebranded as X by Elon Musk' },
+      {
+        y: 'b956',
+        t: 'Apple releases the Apple II personal computer'
+      },
+      {
+        y: 'b951',
+        t: 'Time magazine names the personal computer "Machine of the Year"'
+      },
+      {
+        y: 'b928',
+        t: 'Linus Torvalds releases the first version of the Linux kernel'
+      },
+      {
+        y: 'b926',
+        t: 'The Mosaic web browser is released, popularising the internet'
+      },
+      {
+        y: 'b925',
+        t: 'Jeff Bezos founds Amazon.com in a Seattle garage'
+      },
+      {
+        y: 'b924',
+        t: 'eBay is founded in California'
+      },
+      {
+        y: 'b93c',
+        t: 'Apple launches the iTunes Music Store'
+      },
+      {
+        y: 'b93b',
+        t: 'Google launches Gmail'
+      },
+      {
+        y: 'b939',
+        t: 'Nintendo launches the Wii console'
+      },
+      {
+        y: 'b938',
+        t: 'Amazon releases the Kindle e-reader'
+      },
+      {
+        y: 'b938',
+        t: 'Netflix launches its video streaming service'
+      },
+      {
+        y: 'b937',
+        t: 'Spotify launches its music service in Sweden'
+      },
+      {
+        y: 'b934',
+        t: 'Spotify launches in the United States'
+      },
+      {
+        y: 'b931',
+        t: 'Amazon releases the Echo smart speaker with Alexa'
+      },
+      {
+        y: 'b931',
+        t: 'Facebook acquires WhatsApp'
+      },
+      {
+        y: 'b930',
+        t: 'Apple Music is launched'
+      },
+      {
+        y: 'b90c',
+        t: 'Disney+ launches as a streaming service'
+      },
+      {
+        y: 'b909',
+        t: 'Elon Musk completes his acquisition of Twitter'
+      },
+      {
+        y: 'b908',
+        t: 'Twitter is rebranded as X by Elon Musk'
+      },
 
       // More games & consoles
-      { y: 'b95b', t: 'Atari releases Pong, the first commercially successful video game' },
-      { y: 'b953', t: 'Namco releases Pac-Man in arcades' },
-      { y: 'b93e', t: 'Microsoft releases the first Xbox console' },
-      { y: 'b93a', t: 'Microsoft releases the Xbox 360' },
-      { y: 'b932', t: 'Sony releases the PlayStation 4' },
-      { y: 'b932', t: 'Microsoft releases the Xbox One' },
+      {
+        y: 'b95b',
+        t: 'Atari releases Pong, the first commercially successful video game'
+      },
+      {
+        y: 'b953',
+        t: 'Namco releases Pac-Man in arcades'
+      },
+      {
+        y: 'b93e',
+        t: 'Microsoft releases the first Xbox console'
+      },
+      {
+        y: 'b93a',
+        t: 'Microsoft releases the Xbox 360'
+      },
+      {
+        y: 'b932',
+        t: 'Sony releases the PlayStation 4'
+      },
+      {
+        y: 'b932',
+        t: 'Microsoft releases the Xbox One'
+      },
 
       // More TV & streaming
-      { y: 'b944', t: 'Doctor Who first airs on the BBC' },
-      { y: 'b95e', t: 'Sesame Street premieres on PBS' },
-      { y: 'b958', t: 'Saturday Night Live premieres on NBC' },
-      { y: 'b952', t: 'Only Fools and Horses first airs on the BBC' },
-      { y: 'b92e', t: 'EastEnders first airs on the BBC' },
-      { y: 'b92a', t: 'Seinfeld premieres on NBC' },
-      { y: 'b921', t: 'Seinfeld airs its final episode, watched by 76 million Americans' },
-      { y: 'b922', t: 'The Teletubbies debut on BBC television' },
-      { y: 'b93a', t: 'The Office premieres on NBC in the United States' },
-      { y: 'b932', t: 'Netflix releases its first original series, House of Cards' },
-      { y: 'b90f', t: 'Stranger Things premieres on Netflix' },
-      { y: 'b90c', t: 'Game of Thrones airs its much-debated final episode' },
-      { y: 'b90c', t: 'The Mandalorian introduces Baby Yoda to the world' },
-      { y: 'b90a', t: 'Squid Game becomes a global Netflix phenomenon' },
+      {
+        y: 'b944',
+        t: 'Doctor Who first airs on the BBC'
+      },
+      {
+        y: 'b95e',
+        t: 'Sesame Street premieres on PBS'
+      },
+      {
+        y: 'b958',
+        t: 'Saturday Night Live premieres on NBC'
+      },
+      {
+        y: 'b952',
+        t: 'Only Fools and Horses first airs on the BBC'
+      },
+      {
+        y: 'b92e',
+        t: 'EastEnders first airs on the BBC'
+      },
+      {
+        y: 'b92a',
+        t: 'Seinfeld premieres on NBC'
+      },
+      {
+        y: 'b921',
+        t: 'Seinfeld airs its final episode, watched by 76 million Americans'
+      },
+      {
+        y: 'b922',
+        t: 'The Teletubbies debut on BBC television'
+      },
+      {
+        y: 'b93a',
+        t: 'The Office premieres on NBC in the United States'
+      },
+      {
+        y: 'b932',
+        t: 'Netflix releases its first original series, House of Cards'
+      },
+      {
+        y: 'b90f',
+        t: 'Stranger Things premieres on Netflix'
+      },
+      {
+        y: 'b90c',
+        t: 'Game of Thrones airs its much-debated final episode'
+      },
+      {
+        y: 'b90c',
+        t: 'The Mandalorian introduces Baby Yoda to the world'
+      },
+      {
+        y: 'b90a',
+        t: 'Squid Game becomes a global Netflix phenomenon'
+      },
 
       // More film
-      { y: 'b97e', t: 'Disney releases Snow White and the Seven Dwarfs, the first animated feature film' },
-      { y: 'b97c', t: 'The Wizard of Oz is released' },
-      { y: 'b945', t: 'Dr. No, the first James Bond film, is released' },
-      { y: 'b958', t: 'Jaws is released and defines the summer blockbuster' },
-      { y: 'b957', t: 'Rocky is released in cinemas' },
-      { y: 'b955', t: 'Grease is released in cinemas' },
-      { y: 'b951', t: 'E.T. the Extra-Terrestrial is released' },
-      { y: 'b92f', t: 'Ghostbusters is released in cinemas' },
-      { y: 'b92e', t: 'Back to the Future is released' },
-      { y: 'b92b', t: 'Die Hard is released' },
-      { y: 'b92a', t: "Tim Burton's Batman is released in cinemas" },
-      { y: 'b92a', t: 'The Little Mermaid revives Disney animation' },
-      { y: 'b928', t: 'Beauty and the Beast is released by Disney' },
-      { y: 'b927', t: 'Aladdin is released by Disney' },
-      { y: 'b926', t: 'Jurassic Park dominates the summer box office' },
-      { y: 'b925', t: 'The Lion King is released by Disney' },
-      { y: 'b925', t: 'Pulp Fiction is released in cinemas' },
-      { y: 'b925', t: 'Forrest Gump is released in cinemas' },
-      { y: 'b923', t: 'Independence Day dominates the summer box office' },
-      { y: 'b93c', t: 'Finding Nemo is released by Pixar' },
-      { y: 'b937', t: 'Iron Man kicks off the Marvel Cinematic Universe' },
-      { y: 'b935', t: 'Christopher Nolan releases Inception in cinemas' },
-      { y: 'b935', t: 'Toy Story 3 is released by Pixar' },
-      { y: 'b932', t: 'Disney releases Frozen, a global phenomenon' },
-      { y: 'b930', t: 'Star Wars: The Force Awakens is released' },
-      { y: 'b90e', t: 'Wonder Woman is released in cinemas' },
-      { y: 'b90d', t: "Marvel's Black Panther is released in cinemas" },
-      { y: 'b90b', t: "Pixar's Soul is released" },
-      { y: 'b909', t: 'Top Gun: Maverick is released' },
+      {
+        y: 'b97e',
+        t: 'Disney releases Snow White and the Seven Dwarfs, the first animated feature film'
+      },
+      {
+        y: 'b97c',
+        t: 'The Wizard of Oz is released'
+      },
+      {
+        y: 'b945',
+        t: 'Dr. No, the first James Bond film, is released'
+      },
+      {
+        y: 'b958',
+        t: 'Jaws is released and defines the summer blockbuster'
+      },
+      {
+        y: 'b957',
+        t: 'Rocky is released in cinemas'
+      },
+      {
+        y: 'b955',
+        t: 'Grease is released in cinemas'
+      },
+      {
+        y: 'b951',
+        t: 'E.T. the Extra-Terrestrial is released'
+      },
+      {
+        y: 'b92f',
+        t: 'Ghostbusters is released in cinemas'
+      },
+      {
+        y: 'b92e',
+        t: 'Back to the Future is released'
+      },
+      {
+        y: 'b92b',
+        t: 'Die Hard is released'
+      },
+      {
+        y: 'b92a',
+        t: "Tim Burton's Batman is released in cinemas"
+      },
+      {
+        y: 'b92a',
+        t: 'The Little Mermaid revives Disney animation'
+      },
+      {
+        y: 'b928',
+        t: 'Beauty and the Beast is released by Disney'
+      },
+      {
+        y: 'b927',
+        t: 'Aladdin is released by Disney'
+      },
+      {
+        y: 'b926',
+        t: 'Jurassic Park dominates the summer box office'
+      },
+      {
+        y: 'b925',
+        t: 'The Lion King is released by Disney'
+      },
+      {
+        y: 'b925',
+        t: 'Pulp Fiction is released in cinemas'
+      },
+      {
+        y: 'b925',
+        t: 'Forrest Gump is released in cinemas'
+      },
+      {
+        y: 'b923',
+        t: 'Independence Day dominates the summer box office'
+      },
+      {
+        y: 'b93c',
+        t: 'Finding Nemo is released by Pixar'
+      },
+      {
+        y: 'b937',
+        t: 'Iron Man kicks off the Marvel Cinematic Universe'
+      },
+      {
+        y: 'b935',
+        t: 'Christopher Nolan releases Inception in cinemas'
+      },
+      {
+        y: 'b935',
+        t: 'Toy Story 3 is released by Pixar'
+      },
+      {
+        y: 'b932',
+        t: 'Disney releases Frozen, a global phenomenon'
+      },
+      {
+        y: 'b930',
+        t: 'Star Wars: The Force Awakens is released'
+      },
+      {
+        y: 'b90e',
+        t: 'Wonder Woman is released in cinemas'
+      },
+      {
+        y: 'b90d',
+        t: "Marvel's Black Panther is released in cinemas"
+      },
+      {
+        y: 'b90b',
+        t: "Pixar's Soul is released"
+      },
+      {
+        y: 'b909',
+        t: 'Top Gun: Maverick is released'
+      },
 
       // More music milestones
-      { y: 'b940', t: "The Beatles release Sgt. Pepper's Lonely Hearts Club Band" },
-      { y: 'b95e', t: 'The Beatles give their final public performance on the Apple HQ rooftop' },
-      { y: 'b95d', t: 'The Beatles officially announce their break-up' },
-      { y: 'b95a', t: 'Pink Floyd releases the album The Dark Side of the Moon' },
-      { y: 'b954', t: 'Pink Floyd releases the album The Wall' },
-      { y: 'b951', t: 'Michael Jackson releases the Thriller album' },
-      { y: 'b92f', t: 'Prince releases the album Purple Rain' },
-      { y: 'b92f', t: 'Band Aid records "Do They Know It\'s Christmas?"' },
-      { y: 'b92c', t: 'U2 releases The Joshua Tree album' },
-      { y: 'b928', t: 'Nirvana releases the album Nevermind' },
-      { y: 'b923', t: 'The Spice Girls release "Wannabe" as their debut single' },
-      { y: 'b920', t: 'Napster launches and disrupts the music industry' },
-      { y: 'b931', t: 'Taylor Swift releases her album 1989' },
+      {
+        y: 'b940',
+        t: "The Beatles release Sgt. Pepper's Lonely Hearts Club Band"
+      },
+      {
+        y: 'b95e',
+        t: 'The Beatles give their final public performance on the Apple HQ rooftop'
+      },
+      {
+        y: 'b95d',
+        t: 'The Beatles officially announce their break-up'
+      },
+      {
+        y: 'b95a',
+        t: 'Pink Floyd releases the album The Dark Side of the Moon'
+      },
+      {
+        y: 'b954',
+        t: 'Pink Floyd releases the album The Wall'
+      },
+      {
+        y: 'b951',
+        t: 'Michael Jackson releases the Thriller album'
+      },
+      {
+        y: 'b92f',
+        t: 'Prince releases the album Purple Rain'
+      },
+      {
+        y: 'b92f',
+        t: 'Band Aid records "Do They Know It\'s Christmas?"'
+      },
+      {
+        y: 'b92c',
+        t: 'U2 releases The Joshua Tree album'
+      },
+      {
+        y: 'b928',
+        t: 'Nirvana releases the album Nevermind'
+      },
+      {
+        y: 'b923',
+        t: 'The Spice Girls release "Wannabe" as their debut single'
+      },
+      {
+        y: 'b920',
+        t: 'Napster launches and disrupts the music industry'
+      },
+      {
+        y: 'b931',
+        t: 'Taylor Swift releases her album 1989'
+      },
 
       // More sport
-      { y: 'b95d', t: 'Brazil wins its third FIFA World Cup in Mexico' },
-      { y: 'b957', t: 'Montreal hosts the Summer Olympic Games' },
-      { y: 'b925', t: 'Lillehammer hosts the Winter Olympic Games' },
-      { y: 'b921', t: 'Nagano hosts the Winter Olympic Games' },
-      { y: 'b93d', t: 'Salt Lake City hosts the Winter Olympic Games' },
-      { y: 'b939', t: 'Germany hosts the FIFA World Cup' },
-      { y: 'b939', t: 'Turin hosts the Winter Olympic Games' },
-      { y: 'b935', t: 'Vancouver hosts the Winter Olympic Games' },
-      { y: 'b935', t: 'Spain wins the FIFA World Cup in South Africa' },
-      { y: 'b931', t: 'Sochi hosts the Winter Olympic Games' },
-      { y: 'b90f', t: 'The Chicago Cubs win the World Series, ending a 108-year drought' },
-      { y: 'b90e', t: 'The New England Patriots complete the greatest Super Bowl comeback, 28-3' },
-      { y: 'b90d', t: 'PyeongChang hosts the Winter Olympic Games' },
-      { y: 'b90c', t: 'Tiger Woods wins the Masters after 11 years without a major' },
-      { y: 'b909', t: 'Beijing hosts the Winter Olympic Games' },
+      {
+        y: 'b95d',
+        t: 'Brazil wins its third FIFA World Cup in Mexico'
+      },
+      {
+        y: 'b957',
+        t: 'Montreal hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b925',
+        t: 'Lillehammer hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b921',
+        t: 'Nagano hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b93d',
+        t: 'Salt Lake City hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b939',
+        t: 'Germany hosts the FIFA World Cup'
+      },
+      {
+        y: 'b939',
+        t: 'Turin hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b935',
+        t: 'Vancouver hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b935',
+        t: 'Spain wins the FIFA World Cup in South Africa'
+      },
+      {
+        y: 'b931',
+        t: 'Sochi hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b90f',
+        t: 'The Chicago Cubs win the World Series, ending a 108-year drought'
+      },
+      {
+        y: 'b90e',
+        t: 'The New England Patriots complete the greatest Super Bowl comeback, 28-3'
+      },
+      {
+        y: 'b90d',
+        t: 'PyeongChang hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b90c',
+        t: 'Tiger Woods wins the Masters after 11 years without a major'
+      },
+      {
+        y: 'b909',
+        t: 'Beijing hosts the Winter Olympic Games'
+      },
 
       // More royal & UK culture
-      { y: 'b974', t: 'Princess Elizabeth marries Prince Philip at Westminster Abbey' },
-      { y: 'b95a', t: 'The United Kingdom joins the European Economic Community' },
-      { y: 'b951', t: 'Prince William is born in London' },
-      { y: 'b92f', t: 'Prince Harry is born in London' },
-      { y: 'b93d', t: 'The UK celebrates the Golden Jubilee of Queen Elizabeth II' },
-      { y: 'b930', t: 'Princess Charlotte is born to William and Catherine' },
-      { y: 'b90d', t: 'Prince Louis is born to William and Catherine' },
+      {
+        y: 'b974',
+        t: 'Princess Elizabeth marries Prince Philip at Westminster Abbey'
+      },
+      {
+        y: 'b95a',
+        t: 'The United Kingdom joins the European Economic Community'
+      },
+      {
+        y: 'b951',
+        t: 'Prince William is born in London'
+      },
+      {
+        y: 'b92f',
+        t: 'Prince Harry is born in London'
+      },
+      {
+        y: 'b93d',
+        t: 'The UK celebrates the Golden Jubilee of Queen Elizabeth II'
+      },
+      {
+        y: 'b930',
+        t: 'Princess Charlotte is born to William and Catherine'
+      },
+      {
+        y: 'b90d',
+        t: 'Prince Louis is born to William and Catherine'
+      },
 
       // More culture & everyday life
-      { y: 'b973', t: 'The National Health Service is founded in the United Kingdom' },
-      { y: 'b971', t: 'The Peanuts comic strip debuts in US newspapers' },
-      { y: 'b94c', t: "McDonald's Corporation is founded by Ray Kroc" },
-      { y: 'b94a', t: 'Dr. Seuss publishes The Cat in the Hat' },
-      { y: 'b948', t: 'The Barbie doll is introduced by Mattel' },
-      { y: 'b95c', t: 'Starbucks opens its first store in Seattle' },
-      { y: 'b95c', t: 'Greenpeace is founded in Vancouver' },
-      { y: 'b95a', t: 'The Sydney Opera House officially opens' },
-      { y: 'b955', t: 'Garfield the cat comic strip debuts' },
-      { y: 'b92e', t: 'Calvin and Hobbes debuts in newspapers' },
-      { y: 'b93f', t: 'The Tate Modern opens in London' },
-      { y: 'b93c', t: 'Dan Brown publishes The Da Vinci Code' },
-      { y: 'b93c', t: 'Concorde makes its final commercial flight' },
-      { y: 'b93a', t: 'Stephenie Meyer publishes the first Twilight novel' },
-      { y: 'b937', t: 'The first Hunger Games novel is published' },
-      { y: 'b933', t: 'The Shard opens in London, Europe\'s tallest building at the time' },
-      { y: 'b931', t: 'The Ice Bucket Challenge raises millions for ALS research' },
+      {
+        y: 'b973',
+        t: 'The National Health Service is founded in the United Kingdom'
+      },
+      {
+        y: 'b971',
+        t: 'The Peanuts comic strip debuts in US newspapers'
+      },
+      {
+        y: 'b94c',
+        t: "McDonald's Corporation is founded by Ray Kroc"
+      },
+      {
+        y: 'b94a',
+        t: 'Dr. Seuss publishes The Cat in the Hat'
+      },
+      {
+        y: 'b948',
+        t: 'The Barbie doll is introduced by Mattel'
+      },
+      {
+        y: 'b95c',
+        t: 'Starbucks opens its first store in Seattle'
+      },
+      {
+        y: 'b95c',
+        t: 'Greenpeace is founded in Vancouver'
+      },
+      {
+        y: 'b95a',
+        t: 'The Sydney Opera House officially opens'
+      },
+      {
+        y: 'b955',
+        t: 'Garfield the cat comic strip debuts'
+      },
+      {
+        y: 'b92e',
+        t: 'Calvin and Hobbes debuts in newspapers'
+      },
+      {
+        y: 'b93f',
+        t: 'The Tate Modern opens in London'
+      },
+      {
+        y: 'b93c',
+        t: 'Dan Brown publishes The Da Vinci Code'
+      },
+      {
+        y: 'b93c',
+        t: 'Concorde makes its final commercial flight'
+      },
+      {
+        y: 'b93a',
+        t: 'Stephenie Meyer publishes the first Twilight novel'
+      },
+      {
+        y: 'b937',
+        t: 'The first Hunger Games novel is published'
+      },
+      {
+        y: 'b933',
+        t: 'The Shard opens in London, Europe\'s tallest building at the time'
+      },
+      {
+        y: 'b931',
+        t: 'The Ice Bucket Challenge raises millions for ALS research'
+      },
 
       // More literature
-      { y: 'b94d', t: 'J.R.R. Tolkien publishes The Fellowship of the Ring' },
+      {
+        y: 'b94d',
+        t: 'J.R.R. Tolkien publishes The Fellowship of the Ring'
+      },
 
       // More politics
-      { y: 'b936', t: 'Barack Obama is inaugurated as President of the United States' },
+      {
+        y: 'b936',
+        t: 'Barack Obama is inaugurated as President of the United States'
+      },
 
       // Classic films, pre-1970
-      { y: 'b97a', t: 'Citizen Kane is released' },
-      { y: 'b979', t: 'Casablanca is released' },
-      { y: 'b948', t: 'Some Like It Hot is released' },
-      { y: 'b946', t: "Audrey Hepburn stars in Breakfast at Tiffany's" },
-      { y: 'b943', t: 'Mary Poppins is released' },
-      { y: 'b942', t: 'The Sound of Music is released' },
-      { y: 'b95f', t: 'Stanley Kubrick releases 2001: A Space Odyssey' },
-      { y: 'b95f', t: 'Planet of the Apes is released' },
+      {
+        y: 'b97a',
+        t: 'Citizen Kane is released'
+      },
+      {
+        y: 'b979',
+        t: 'Casablanca is released'
+      },
+      {
+        y: 'b948',
+        t: 'Some Like It Hot is released'
+      },
+      {
+        y: 'b946',
+        t: "Audrey Hepburn stars in Breakfast at Tiffany's"
+      },
+      {
+        y: 'b943',
+        t: 'Mary Poppins is released'
+      },
+      {
+        y: 'b942',
+        t: 'The Sound of Music is released'
+      },
+      {
+        y: 'b95f',
+        t: 'Stanley Kubrick releases 2001: A Space Odyssey'
+      },
+      {
+        y: 'b95f',
+        t: 'Planet of the Apes is released'
+      },
 
       // 1970s films
-      { y: 'b95c', t: 'Willy Wonka & the Chocolate Factory is released' },
-      { y: 'b95b', t: 'Francis Ford Coppola releases The Godfather' },
-      { y: 'b95a', t: 'The Sting is released' },
-      { y: 'b959', t: 'The Godfather Part II is released' },
-      { y: 'b959', t: 'Mel Brooks releases Blazing Saddles' },
-      { y: 'b959', t: 'Young Frankenstein is released' },
-      { y: 'b958', t: "One Flew Over the Cuckoo's Nest is released" },
-      { y: 'b957', t: 'Martin Scorsese releases Taxi Driver' },
-      { y: 'b956', t: 'Woody Allen releases Annie Hall' },
-      { y: 'b956', t: 'Saturday Night Fever is released' },
-      { y: 'b956', t: 'Close Encounters of the Third Kind is released' },
-      { y: 'b955', t: 'Richard Donner releases Superman' },
-      { y: 'b954', t: 'Apocalypse Now is released' },
-      { y: 'b954', t: 'Ridley Scott releases Alien' },
-      { y: 'b954', t: 'Kramer vs. Kramer is released' },
-      { y: 'b954', t: "Monty Python's Life of Brian is released" },
+      {
+        y: 'b95c',
+        t: 'Willy Wonka & the Chocolate Factory is released'
+      },
+      {
+        y: 'b95b',
+        t: 'Francis Ford Coppola releases The Godfather'
+      },
+      {
+        y: 'b95a',
+        t: 'The Sting is released'
+      },
+      {
+        y: 'b959',
+        t: 'The Godfather Part II is released'
+      },
+      {
+        y: 'b959',
+        t: 'Mel Brooks releases Blazing Saddles'
+      },
+      {
+        y: 'b959',
+        t: 'Young Frankenstein is released'
+      },
+      {
+        y: 'b958',
+        t: "One Flew Over the Cuckoo's Nest is released"
+      },
+      {
+        y: 'b957',
+        t: 'Martin Scorsese releases Taxi Driver'
+      },
+      {
+        y: 'b956',
+        t: 'Woody Allen releases Annie Hall'
+      },
+      {
+        y: 'b956',
+        t: 'Saturday Night Fever is released'
+      },
+      {
+        y: 'b956',
+        t: 'Close Encounters of the Third Kind is released'
+      },
+      {
+        y: 'b955',
+        t: 'Richard Donner releases Superman'
+      },
+      {
+        y: 'b954',
+        t: 'Apocalypse Now is released'
+      },
+      {
+        y: 'b954',
+        t: 'Ridley Scott releases Alien'
+      },
+      {
+        y: 'b954',
+        t: 'Kramer vs. Kramer is released'
+      },
+      {
+        y: 'b954',
+        t: "Monty Python's Life of Brian is released"
+      },
 
       // 1980s films
-      { y: 'b953', t: 'The Empire Strikes Back is released' },
-      { y: 'b953', t: 'Stanley Kubrick releases The Shining' },
-      { y: 'b953', t: 'Airplane! is released' },
-      { y: 'b952', t: 'Raiders of the Lost Ark is released' },
-      { y: 'b952', t: 'Chariots of Fire is released' },
-      { y: 'b951', t: 'Ridley Scott releases Blade Runner' },
-      { y: 'b950', t: 'Return of the Jedi is released' },
-      { y: 'b950', t: 'Brian De Palma releases Scarface' },
-      { y: 'b92f', t: 'Amadeus is released' },
-      { y: 'b92f', t: 'Beverly Hills Cop is released' },
-      { y: 'b92f', t: 'James Cameron releases The Terminator' },
-      { y: 'b92f', t: 'Indiana Jones and the Temple of Doom is released' },
-      { y: 'b92e', t: 'The Breakfast Club is released' },
-      { y: 'b92e', t: 'Out of Africa is released' },
-      { y: 'b92d', t: 'Top Gun is released' },
-      { y: 'b92d', t: "Ferris Bueller's Day Off is released" },
-      { y: 'b92d', t: 'Oliver Stone releases Platoon' },
-      { y: 'b92d', t: 'James Cameron releases Aliens' },
-      { y: 'b92c', t: 'Dirty Dancing is released' },
-      { y: 'b92c', t: 'The Princess Bride is released' },
-      { y: 'b92c', t: 'Good Morning, Vietnam is released' },
-      { y: 'b92c', t: 'Fatal Attraction is released' },
-      { y: 'b92c', t: 'Oliver Stone releases Wall Street' },
-      { y: 'b92b', t: 'Rain Man is released' },
-      { y: 'b92b', t: 'Coming to America is released' },
-      { y: 'b92b', t: 'Who Framed Roger Rabbit is released' },
-      { y: 'b92b', t: 'Tom Hanks stars in Big' },
-      { y: 'b92a', t: 'Indiana Jones and the Last Crusade is released' },
-      { y: 'b92a', t: 'When Harry Met Sally is released' },
-      { y: 'b92a', t: 'Dead Poets Society is released' },
-      { y: 'b92a', t: 'Driving Miss Daisy is released' },
-      { y: 'b92a', t: 'Field of Dreams is released' },
+      {
+        y: 'b953',
+        t: 'The Empire Strikes Back is released'
+      },
+      {
+        y: 'b953',
+        t: 'Stanley Kubrick releases The Shining'
+      },
+      {
+        y: 'b953',
+        t: 'Airplane! is released'
+      },
+      {
+        y: 'b952',
+        t: 'Raiders of the Lost Ark is released'
+      },
+      {
+        y: 'b952',
+        t: 'Chariots of Fire is released'
+      },
+      {
+        y: 'b951',
+        t: 'Ridley Scott releases Blade Runner'
+      },
+      {
+        y: 'b950',
+        t: 'Return of the Jedi is released'
+      },
+      {
+        y: 'b950',
+        t: 'Brian De Palma releases Scarface'
+      },
+      {
+        y: 'b92f',
+        t: 'Amadeus is released'
+      },
+      {
+        y: 'b92f',
+        t: 'Beverly Hills Cop is released'
+      },
+      {
+        y: 'b92f',
+        t: 'James Cameron releases The Terminator'
+      },
+      {
+        y: 'b92f',
+        t: 'Indiana Jones and the Temple of Doom is released'
+      },
+      {
+        y: 'b92e',
+        t: 'The Breakfast Club is released'
+      },
+      {
+        y: 'b92e',
+        t: 'Out of Africa is released'
+      },
+      {
+        y: 'b92d',
+        t: 'Top Gun is released'
+      },
+      {
+        y: 'b92d',
+        t: "Ferris Bueller's Day Off is released"
+      },
+      {
+        y: 'b92d',
+        t: 'Oliver Stone releases Platoon'
+      },
+      {
+        y: 'b92d',
+        t: 'James Cameron releases Aliens'
+      },
+      {
+        y: 'b92c',
+        t: 'Dirty Dancing is released'
+      },
+      {
+        y: 'b92c',
+        t: 'The Princess Bride is released'
+      },
+      {
+        y: 'b92c',
+        t: 'Good Morning, Vietnam is released'
+      },
+      {
+        y: 'b92c',
+        t: 'Fatal Attraction is released'
+      },
+      {
+        y: 'b92c',
+        t: 'Oliver Stone releases Wall Street'
+      },
+      {
+        y: 'b92b',
+        t: 'Rain Man is released'
+      },
+      {
+        y: 'b92b',
+        t: 'Coming to America is released'
+      },
+      {
+        y: 'b92b',
+        t: 'Who Framed Roger Rabbit is released'
+      },
+      {
+        y: 'b92b',
+        t: 'Tom Hanks stars in Big'
+      },
+      {
+        y: 'b92a',
+        t: 'Indiana Jones and the Last Crusade is released'
+      },
+      {
+        y: 'b92a',
+        t: 'When Harry Met Sally is released'
+      },
+      {
+        y: 'b92a',
+        t: 'Dead Poets Society is released'
+      },
+      {
+        y: 'b92a',
+        t: 'Driving Miss Daisy is released'
+      },
+      {
+        y: 'b92a',
+        t: 'Field of Dreams is released'
+      },
 
       // 1990s films
-      { y: 'b929', t: 'Martin Scorsese releases Goodfellas' },
-      { y: 'b929', t: 'Home Alone is released' },
-      { y: 'b929', t: 'Pretty Woman is released' },
-      { y: 'b929', t: 'Dances with Wolves is released' },
-      { y: 'b929', t: 'Ghost is released in cinemas' },
-      { y: 'b928', t: 'Terminator 2: Judgment Day is released' },
-      { y: 'b928', t: 'The Silence of the Lambs is released' },
-      { y: 'b928', t: 'Thelma & Louise is released' },
-      { y: 'b927', t: 'A Few Good Men is released' },
-      { y: 'b927', t: "Wayne's World is released" },
-      { y: 'b926', t: 'Bill Murray stars in Groundhog Day' },
-      { y: 'b926', t: 'Mrs. Doubtfire is released' },
-      { y: 'b926', t: 'Sleepless in Seattle is released' },
-      { y: 'b925', t: 'Keanu Reeves stars in Speed' },
-      { y: 'b925', t: 'Dumb and Dumber is released' },
-      { y: 'b925', t: 'Four Weddings and a Funeral is released' },
-      { y: 'b924', t: 'Mel Gibson releases Braveheart' },
-      { y: 'b924', t: 'Apollo 13 is released in cinemas' },
-      { y: 'b924', t: 'Pixar releases Toy Story in cinemas' },
-      { y: 'b923', t: 'Fargo is released' },
-      { y: 'b923', t: 'Trainspotting is released' },
-      { y: 'b923', t: 'The English Patient is released' },
-      { y: 'b923', t: 'Scream is released in cinemas' },
-      { y: 'b922', t: 'Good Will Hunting is released' },
-      { y: 'b922', t: 'Men in Black is released' },
-      { y: 'b921', t: 'Shakespeare in Love is released' },
-      { y: 'b921', t: "There's Something About Mary is released" },
-      { y: 'b921', t: 'The Big Lebowski is released' },
-      { y: 'b921', t: 'The Truman Show is released' },
-      { y: 'b920', t: 'David Fincher releases Fight Club' },
-      { y: 'b920', t: 'American Beauty is released' },
-      { y: 'b920', t: 'The Sixth Sense is released' },
-      { y: 'b920', t: 'Notting Hill is released' },
-      { y: 'b920', t: 'The Blair Witch Project is released' },
+      {
+        y: 'b929',
+        t: 'Martin Scorsese releases Goodfellas'
+      },
+      {
+        y: 'b929',
+        t: 'Home Alone is released'
+      },
+      {
+        y: 'b929',
+        t: 'Pretty Woman is released'
+      },
+      {
+        y: 'b929',
+        t: 'Dances with Wolves is released'
+      },
+      {
+        y: 'b929',
+        t: 'Ghost is released in cinemas'
+      },
+      {
+        y: 'b928',
+        t: 'Terminator 2: Judgment Day is released'
+      },
+      {
+        y: 'b928',
+        t: 'The Silence of the Lambs is released'
+      },
+      {
+        y: 'b928',
+        t: 'Thelma & Louise is released'
+      },
+      {
+        y: 'b927',
+        t: 'A Few Good Men is released'
+      },
+      {
+        y: 'b927',
+        t: "Wayne's World is released"
+      },
+      {
+        y: 'b926',
+        t: 'Bill Murray stars in Groundhog Day'
+      },
+      {
+        y: 'b926',
+        t: 'Mrs. Doubtfire is released'
+      },
+      {
+        y: 'b926',
+        t: 'Sleepless in Seattle is released'
+      },
+      {
+        y: 'b925',
+        t: 'Keanu Reeves stars in Speed'
+      },
+      {
+        y: 'b925',
+        t: 'Dumb and Dumber is released'
+      },
+      {
+        y: 'b925',
+        t: 'Four Weddings and a Funeral is released'
+      },
+      {
+        y: 'b924',
+        t: 'Mel Gibson releases Braveheart'
+      },
+      {
+        y: 'b924',
+        t: 'Apollo 13 is released in cinemas'
+      },
+      {
+        y: 'b924',
+        t: 'Pixar releases Toy Story in cinemas'
+      },
+      {
+        y: 'b923',
+        t: 'Fargo is released'
+      },
+      {
+        y: 'b923',
+        t: 'Trainspotting is released'
+      },
+      {
+        y: 'b923',
+        t: 'The English Patient is released'
+      },
+      {
+        y: 'b923',
+        t: 'Scream is released in cinemas'
+      },
+      {
+        y: 'b922',
+        t: 'Good Will Hunting is released'
+      },
+      {
+        y: 'b922',
+        t: 'Men in Black is released'
+      },
+      {
+        y: 'b921',
+        t: 'Shakespeare in Love is released'
+      },
+      {
+        y: 'b921',
+        t: "There's Something About Mary is released"
+      },
+      {
+        y: 'b921',
+        t: 'The Big Lebowski is released'
+      },
+      {
+        y: 'b921',
+        t: 'The Truman Show is released'
+      },
+      {
+        y: 'b920',
+        t: 'David Fincher releases Fight Club'
+      },
+      {
+        y: 'b920',
+        t: 'American Beauty is released'
+      },
+      {
+        y: 'b920',
+        t: 'The Sixth Sense is released'
+      },
+      {
+        y: 'b920',
+        t: 'Notting Hill is released'
+      },
+      {
+        y: 'b920',
+        t: 'The Blair Witch Project is released'
+      },
 
       // 2000s films
-      { y: 'b93f', t: 'Ridley Scott releases Gladiator' },
-      { y: 'b93f', t: 'Cast Away is released' },
-      { y: 'b93f', t: "O Brother, Where Art Thou? is released" },
-      { y: 'b93f', t: 'Meet the Parents is released' },
-      { y: 'b93e', t: 'DreamWorks releases Shrek' },
-      { y: 'b93e', t: 'A Beautiful Mind is released' },
-      { y: 'b93e', t: 'The Lord of the Rings: The Fellowship of the Ring is released' },
-      { y: 'b93e', t: 'Monsters, Inc. is released by Pixar' },
-      { y: 'b93e', t: "Bridget Jones's Diary is released" },
-      { y: 'b93e', t: 'Legally Blonde is released' },
-      { y: 'b93e', t: 'Amélie is released in cinemas' },
-      { y: 'b93d', t: 'Sam Raimi releases Spider-Man' },
-      { y: 'b93d', t: 'Chicago is released in cinemas' },
-      { y: 'b93d', t: 'The Lord of the Rings: The Two Towers is released' },
-      { y: 'b93d', t: 'Catch Me If You Can is released' },
-      { y: 'b93c', t: 'Pirates of the Caribbean: The Curse of the Black Pearl is released' },
-      { y: 'b93c', t: 'Love Actually is released' },
-      { y: 'b93c', t: 'Lost in Translation is released' },
-      { y: 'b93c', t: 'Elf is released in cinemas' },
-      { y: 'b93b', t: 'Shrek 2 is released' },
-      { y: 'b93b', t: 'The Incredibles is released by Pixar' },
-      { y: 'b93b', t: 'Mean Girls is released' },
-      { y: 'b93b', t: 'Million Dollar Baby is released' },
-      { y: 'b93b', t: 'Anchorman: The Legend of Ron Burgundy is released' },
-      { y: 'b93b', t: 'The Notebook is released in cinemas' },
-      { y: 'b93a', t: 'Batman Begins is released' },
-      { y: 'b93a', t: 'Wedding Crashers is released' },
-      { y: 'b93a', t: 'Peter Jackson releases King Kong' },
-      { y: 'b93a', t: 'The 40-Year-Old Virgin is released' },
-      { y: 'b939', t: 'Martin Scorsese releases The Departed' },
-      { y: 'b939', t: 'Cars is released by Pixar' },
-      { y: 'b939', t: 'The Devil Wears Prada is released' },
-      { y: 'b939', t: 'Casino Royale reboots the James Bond film series' },
-      { y: 'b939', t: 'Little Miss Sunshine is released' },
-      { y: 'b938', t: 'No Country for Old Men is released' },
-      { y: 'b938', t: 'Ratatouille is released by Pixar' },
-      { y: 'b938', t: 'Juno is released' },
-      { y: 'b938', t: 'Superbad is released' },
-      { y: 'b938', t: 'Michael Bay releases Transformers' },
-      { y: 'b937', t: 'Christopher Nolan releases The Dark Knight' },
-      { y: 'b937', t: 'WALL-E is released by Pixar' },
-      { y: 'b937', t: 'Slumdog Millionaire is released' },
-      { y: 'b937', t: 'Twilight is released in cinemas' },
-      { y: 'b937', t: 'Mamma Mia! is released in cinemas' },
-      { y: 'b936', t: 'Up is released by Pixar' },
-      { y: 'b936', t: 'The Hangover is released' },
+      {
+        y: 'b93f',
+        t: 'Ridley Scott releases Gladiator'
+      },
+      {
+        y: 'b93f',
+        t: 'Cast Away is released'
+      },
+      {
+        y: 'b93f',
+        t: "O Brother, Where Art Thou? is released"
+      },
+      {
+        y: 'b93f',
+        t: 'Meet the Parents is released'
+      },
+      {
+        y: 'b93e',
+        t: 'DreamWorks releases Shrek'
+      },
+      {
+        y: 'b93e',
+        t: 'A Beautiful Mind is released'
+      },
+      {
+        y: 'b93e',
+        t: 'The Lord of the Rings: The Fellowship of the Ring is released'
+      },
+      {
+        y: 'b93e',
+        t: 'Monsters, Inc. is released by Pixar'
+      },
+      {
+        y: 'b93e',
+        t: "Bridget Jones's Diary is released"
+      },
+      {
+        y: 'b93e',
+        t: 'Legally Blonde is released'
+      },
+      {
+        y: 'b93e',
+        t: 'Amélie is released in cinemas'
+      },
+      {
+        y: 'b93d',
+        t: 'Sam Raimi releases Spider-Man'
+      },
+      {
+        y: 'b93d',
+        t: 'Chicago is released in cinemas'
+      },
+      {
+        y: 'b93d',
+        t: 'The Lord of the Rings: The Two Towers is released'
+      },
+      {
+        y: 'b93d',
+        t: 'Catch Me If You Can is released'
+      },
+      {
+        y: 'b93c',
+        t: 'Pirates of the Caribbean: The Curse of the Black Pearl is released'
+      },
+      {
+        y: 'b93c',
+        t: 'Love Actually is released'
+      },
+      {
+        y: 'b93c',
+        t: 'Lost in Translation is released'
+      },
+      {
+        y: 'b93c',
+        t: 'Elf is released in cinemas'
+      },
+      {
+        y: 'b93b',
+        t: 'Shrek 2 is released'
+      },
+      {
+        y: 'b93b',
+        t: 'The Incredibles is released by Pixar'
+      },
+      {
+        y: 'b93b',
+        t: 'Mean Girls is released'
+      },
+      {
+        y: 'b93b',
+        t: 'Million Dollar Baby is released'
+      },
+      {
+        y: 'b93b',
+        t: 'Anchorman: The Legend of Ron Burgundy is released'
+      },
+      {
+        y: 'b93b',
+        t: 'The Notebook is released in cinemas'
+      },
+      {
+        y: 'b93a',
+        t: 'Batman Begins is released'
+      },
+      {
+        y: 'b93a',
+        t: 'Wedding Crashers is released'
+      },
+      {
+        y: 'b93a',
+        t: 'Peter Jackson releases King Kong'
+      },
+      {
+        y: 'b93a',
+        t: 'The 40-Year-Old Virgin is released'
+      },
+      {
+        y: 'b939',
+        t: 'Martin Scorsese releases The Departed'
+      },
+      {
+        y: 'b939',
+        t: 'Cars is released by Pixar'
+      },
+      {
+        y: 'b939',
+        t: 'The Devil Wears Prada is released'
+      },
+      {
+        y: 'b939',
+        t: 'Casino Royale reboots the James Bond film series'
+      },
+      {
+        y: 'b939',
+        t: 'Little Miss Sunshine is released'
+      },
+      {
+        y: 'b938',
+        t: 'No Country for Old Men is released'
+      },
+      {
+        y: 'b938',
+        t: 'Ratatouille is released by Pixar'
+      },
+      {
+        y: 'b938',
+        t: 'Juno is released'
+      },
+      {
+        y: 'b938',
+        t: 'Superbad is released'
+      },
+      {
+        y: 'b938',
+        t: 'Michael Bay releases Transformers'
+      },
+      {
+        y: 'b937',
+        t: 'Christopher Nolan releases The Dark Knight'
+      },
+      {
+        y: 'b937',
+        t: 'WALL-E is released by Pixar'
+      },
+      {
+        y: 'b937',
+        t: 'Slumdog Millionaire is released'
+      },
+      {
+        y: 'b937',
+        t: 'Twilight is released in cinemas'
+      },
+      {
+        y: 'b937',
+        t: 'Mamma Mia! is released in cinemas'
+      },
+      {
+        y: 'b936',
+        t: 'Up is released by Pixar'
+      },
+      {
+        y: 'b936',
+        t: 'The Hangover is released'
+      },
 
       // 2010s films
-      { y: 'b935', t: 'The Social Network is released' },
-      { y: 'b935', t: 'Black Swan is released' },
-      { y: 'b935', t: 'The Help is released' },
-      { y: 'b934', t: 'Moneyball is released' },
-      { y: 'b934', t: 'Bridesmaids is released' },
-      { y: 'b934', t: "Harry Potter and the Deathly Hallows Part 2 is released" },
-      { y: 'b933', t: 'The Hunger Games film is released' },
-      { y: 'b933', t: 'Argo is released' },
-      { y: 'b933', t: 'Skyfall is released' },
-      { y: 'b933', t: 'Quentin Tarantino releases Django Unchained' },
-      { y: 'b932', t: '12 Years a Slave is released' },
-      { y: 'b932', t: 'Alfonso Cuarón releases Gravity' },
-      { y: 'b932', t: 'Her is released in cinemas' },
-      { y: 'b932', t: 'Martin Scorsese releases The Wolf of Wall Street' },
-      { y: 'b931', t: 'Boyhood is released after 12 years of filming' },
-      { y: 'b931', t: 'Birdman is released' },
-      { y: 'b931', t: 'Guardians of the Galaxy is released' },
-      { y: 'b931', t: 'Christopher Nolan releases Interstellar' },
-      { y: 'b931', t: 'Wes Anderson releases The Grand Budapest Hotel' },
-      { y: 'b931', t: 'The LEGO Movie is released' },
-      { y: 'b930', t: 'Spotlight is released in cinemas' },
-      { y: 'b930', t: 'Mad Max: Fury Road is released' },
-      { y: 'b930', t: 'Alejandro Iñárritu releases The Revenant' },
-      { y: 'b930', t: 'Ridley Scott releases The Martian' },
-      { y: 'b930', t: 'Inside Out is released by Pixar' },
-      { y: 'b930', t: 'Jurassic World is released' },
-      { y: 'b90f', t: 'Moonlight is released in cinemas' },
-      { y: 'b90f', t: 'La La Land is released' },
-      { y: 'b90f', t: 'Denis Villeneuve releases Arrival' },
-      { y: 'b90f', t: 'Zootopia is released by Disney' },
-      { y: 'b90f', t: 'Deadpool is released' },
-      { y: 'b90f', t: 'Rogue One: A Star Wars Story is released' },
-      { y: 'b90e', t: 'Jordan Peele releases Get Out' },
-      { y: 'b90e', t: 'Christopher Nolan releases Dunkirk' },
-      { y: 'b90e', t: 'Coco is released by Pixar' },
-      { y: 'b90e', t: 'The Greatest Showman is released' },
-      { y: 'b90e', t: 'Guillermo del Toro releases The Shape of Water' },
-      { y: 'b90d', t: 'Green Book is released' },
-      { y: 'b90d', t: 'A Star Is Born is released in cinemas' },
-      { y: 'b90d', t: 'Bohemian Rhapsody is released in cinemas' },
-      { y: 'b90d', t: 'Crazy Rich Asians is released' },
-      { y: 'b90d', t: 'A Quiet Place is released' },
-      { y: 'b90c', t: 'Joker is released in cinemas' },
-      { y: 'b90c', t: 'Quentin Tarantino releases Once Upon a Time in Hollywood' },
-      { y: 'b90c', t: 'Sam Mendes releases 1917' },
-      { y: 'b90c', t: 'Knives Out is released' },
+      {
+        y: 'b935',
+        t: 'The Social Network is released'
+      },
+      {
+        y: 'b935',
+        t: 'Black Swan is released'
+      },
+      {
+        y: 'b935',
+        t: 'The Help is released'
+      },
+      {
+        y: 'b934',
+        t: 'Moneyball is released'
+      },
+      {
+        y: 'b934',
+        t: 'Bridesmaids is released'
+      },
+      {
+        y: 'b934',
+        t: "Harry Potter and the Deathly Hallows Part 2 is released"
+      },
+      {
+        y: 'b933',
+        t: 'The Hunger Games film is released'
+      },
+      {
+        y: 'b933',
+        t: 'Argo is released'
+      },
+      {
+        y: 'b933',
+        t: 'Skyfall is released'
+      },
+      {
+        y: 'b933',
+        t: 'Quentin Tarantino releases Django Unchained'
+      },
+      {
+        y: 'b932',
+        t: '12 Years a Slave is released'
+      },
+      {
+        y: 'b932',
+        t: 'Alfonso Cuarón releases Gravity'
+      },
+      {
+        y: 'b932',
+        t: 'Her is released in cinemas'
+      },
+      {
+        y: 'b932',
+        t: 'Martin Scorsese releases The Wolf of Wall Street'
+      },
+      {
+        y: 'b931',
+        t: 'Boyhood is released after 12 years of filming'
+      },
+      {
+        y: 'b931',
+        t: 'Birdman is released'
+      },
+      {
+        y: 'b931',
+        t: 'Guardians of the Galaxy is released'
+      },
+      {
+        y: 'b931',
+        t: 'Christopher Nolan releases Interstellar'
+      },
+      {
+        y: 'b931',
+        t: 'Wes Anderson releases The Grand Budapest Hotel'
+      },
+      {
+        y: 'b931',
+        t: 'The LEGO Movie is released'
+      },
+      {
+        y: 'b930',
+        t: 'Spotlight is released in cinemas'
+      },
+      {
+        y: 'b930',
+        t: 'Mad Max: Fury Road is released'
+      },
+      {
+        y: 'b930',
+        t: 'Alejandro Iñárritu releases The Revenant'
+      },
+      {
+        y: 'b930',
+        t: 'Ridley Scott releases The Martian'
+      },
+      {
+        y: 'b930',
+        t: 'Inside Out is released by Pixar'
+      },
+      {
+        y: 'b930',
+        t: 'Jurassic World is released'
+      },
+      {
+        y: 'b90f',
+        t: 'Moonlight is released in cinemas'
+      },
+      {
+        y: 'b90f',
+        t: 'La La Land is released'
+      },
+      {
+        y: 'b90f',
+        t: 'Denis Villeneuve releases Arrival'
+      },
+      {
+        y: 'b90f',
+        t: 'Zootopia is released by Disney'
+      },
+      {
+        y: 'b90f',
+        t: 'Deadpool is released'
+      },
+      {
+        y: 'b90f',
+        t: 'Rogue One: A Star Wars Story is released'
+      },
+      {
+        y: 'b90e',
+        t: 'Jordan Peele releases Get Out'
+      },
+      {
+        y: 'b90e',
+        t: 'Christopher Nolan releases Dunkirk'
+      },
+      {
+        y: 'b90e',
+        t: 'Coco is released by Pixar'
+      },
+      {
+        y: 'b90e',
+        t: 'The Greatest Showman is released'
+      },
+      {
+        y: 'b90e',
+        t: 'Guillermo del Toro releases The Shape of Water'
+      },
+      {
+        y: 'b90d',
+        t: 'Green Book is released'
+      },
+      {
+        y: 'b90d',
+        t: 'A Star Is Born is released in cinemas'
+      },
+      {
+        y: 'b90d',
+        t: 'Bohemian Rhapsody is released in cinemas'
+      },
+      {
+        y: 'b90d',
+        t: 'Crazy Rich Asians is released'
+      },
+      {
+        y: 'b90d',
+        t: 'A Quiet Place is released'
+      },
+      {
+        y: 'b90c',
+        t: 'Joker is released in cinemas'
+      },
+      {
+        y: 'b90c',
+        t: 'Quentin Tarantino releases Once Upon a Time in Hollywood'
+      },
+      {
+        y: 'b90c',
+        t: 'Sam Mendes releases 1917'
+      },
+      {
+        y: 'b90c',
+        t: 'Knives Out is released'
+      },
 
       // 2020s films
-      { y: 'b90b', t: 'Nomadland is released' },
-      { y: 'b90a', t: 'CODA is released' },
-      { y: 'b90a', t: 'Denis Villeneuve releases Dune' },
-      { y: 'b90a', t: 'Spider-Man: No Way Home is released' },
-      { y: 'b909', t: 'Everything Everywhere All at Once is released' },
-      { y: 'b909', t: 'Avatar: The Way of Water is released' },
-      { y: 'b907', t: 'Dune: Part Two is released' },
-      { y: 'b907', t: 'Inside Out 2 is released by Pixar' },
+      {
+        y: 'b90b',
+        t: 'Nomadland is released'
+      },
+      {
+        y: 'b90a',
+        t: 'CODA is released'
+      },
+      {
+        y: 'b90a',
+        t: 'Denis Villeneuve releases Dune'
+      },
+      {
+        y: 'b90a',
+        t: 'Spider-Man: No Way Home is released'
+      },
+      {
+        y: 'b909',
+        t: 'Everything Everywhere All at Once is released'
+      },
+      {
+        y: 'b909',
+        t: 'Avatar: The Way of Water is released'
+      },
+      {
+        y: 'b907',
+        t: 'Dune: Part Two is released'
+      },
+      {
+        y: 'b907',
+        t: 'Inside Out 2 is released by Pixar'
+      },
 
       // More TV
-      { y: 'b970', t: 'I Love Lucy premieres on CBS' },
-      { y: 'b948', t: 'The Twilight Zone premieres' },
-      { y: 'b947', t: 'The Flintstones premieres' },
-      { y: 'b941', t: 'Star Trek premieres on NBC' },
-      { y: 'b95f', t: '60 Minutes premieres on CBS' },
-      { y: 'b95b', t: "M*A*S*H premieres on CBS" },
-      { y: 'b959', t: 'Happy Days premieres on ABC' },
-      { y: 'b956', t: "Charlie's Angels premieres on ABC" },
-      { y: 'b955', t: 'Dallas premieres on CBS' },
-      { y: 'b951', t: 'Cheers premieres on NBC' },
-      { y: 'b950', t: 'The final M*A*S*H episode draws 106 million viewers' },
-      { y: 'b92f', t: 'The Cosby Show premieres on NBC' },
-      { y: 'b92d', t: 'The Oprah Winfrey Show goes national' },
-      { y: 'b92c', t: 'Married with Children premieres on Fox' },
-      { y: 'b929', t: 'Beverly Hills 90210 premieres on Fox' },
-      { y: 'b929', t: 'David Lynch releases Twin Peaks on ABC' },
-      { y: 'b928', t: 'Home Improvement premieres on ABC' },
-      { y: 'b926', t: 'The X-Files premieres on Fox' },
-      { y: 'b925', t: 'ER premieres on NBC' },
-      { y: 'b921', t: 'Sex and the City premieres on HBO' },
-      { y: 'b920', t: 'The Sopranos premieres on HBO' },
-      { y: 'b93f', t: 'Survivor premieres on CBS' },
-      { y: 'b93d', t: 'American Idol premieres on Fox' },
-      { y: 'b93b', t: 'Lost premieres on ABC' },
-      { y: 'b93b', t: 'Desperate Housewives premieres on ABC' },
-      { y: 'b93a', t: "Grey's Anatomy premieres on ABC" },
-      { y: 'b938', t: 'Mad Men premieres on AMC' },
-      { y: 'b936', t: 'Glee premieres on Fox' },
-      { y: 'b935', t: 'Downton Abbey premieres on ITV' },
-      { y: 'b935', t: 'The Walking Dead premieres on AMC' },
-      { y: 'b932', t: 'Breaking Bad airs its final episode' },
-      { y: 'b90f', t: 'This Is Us premieres on NBC' },
-      { y: 'b90e', t: "The Handmaid's Tale premieres on Hulu" },
+      {
+        y: 'b970',
+        t: 'I Love Lucy premieres on CBS'
+      },
+      {
+        y: 'b948',
+        t: 'The Twilight Zone premieres'
+      },
+      {
+        y: 'b947',
+        t: 'The Flintstones premieres'
+      },
+      {
+        y: 'b941',
+        t: 'Star Trek premieres on NBC'
+      },
+      {
+        y: 'b95f',
+        t: '60 Minutes premieres on CBS'
+      },
+      {
+        y: 'b95b',
+        t: "M*A*S*H premieres on CBS"
+      },
+      {
+        y: 'b959',
+        t: 'Happy Days premieres on ABC'
+      },
+      {
+        y: 'b956',
+        t: "Charlie's Angels premieres on ABC"
+      },
+      {
+        y: 'b955',
+        t: 'Dallas premieres on CBS'
+      },
+      {
+        y: 'b951',
+        t: 'Cheers premieres on NBC'
+      },
+      {
+        y: 'b950',
+        t: 'The final M*A*S*H episode draws 106 million viewers'
+      },
+      {
+        y: 'b92f',
+        t: 'The Cosby Show premieres on NBC'
+      },
+      {
+        y: 'b92d',
+        t: 'The Oprah Winfrey Show goes national'
+      },
+      {
+        y: 'b92c',
+        t: 'Married with Children premieres on Fox'
+      },
+      {
+        y: 'b929',
+        t: 'Beverly Hills 90210 premieres on Fox'
+      },
+      {
+        y: 'b929',
+        t: 'David Lynch releases Twin Peaks on ABC'
+      },
+      {
+        y: 'b928',
+        t: 'Home Improvement premieres on ABC'
+      },
+      {
+        y: 'b926',
+        t: 'The X-Files premieres on Fox'
+      },
+      {
+        y: 'b925',
+        t: 'ER premieres on NBC'
+      },
+      {
+        y: 'b921',
+        t: 'Sex and the City premieres on HBO'
+      },
+      {
+        y: 'b920',
+        t: 'The Sopranos premieres on HBO'
+      },
+      {
+        y: 'b93f',
+        t: 'Survivor premieres on CBS'
+      },
+      {
+        y: 'b93d',
+        t: 'American Idol premieres on Fox'
+      },
+      {
+        y: 'b93b',
+        t: 'Lost premieres on ABC'
+      },
+      {
+        y: 'b93b',
+        t: 'Desperate Housewives premieres on ABC'
+      },
+      {
+        y: 'b93a',
+        t: "Grey's Anatomy premieres on ABC"
+      },
+      {
+        y: 'b938',
+        t: 'Mad Men premieres on AMC'
+      },
+      {
+        y: 'b936',
+        t: 'Glee premieres on Fox'
+      },
+      {
+        y: 'b935',
+        t: 'Downton Abbey premieres on ITV'
+      },
+      {
+        y: 'b935',
+        t: 'The Walking Dead premieres on AMC'
+      },
+      {
+        y: 'b932',
+        t: 'Breaking Bad airs its final episode'
+      },
+      {
+        y: 'b90f',
+        t: 'This Is Us premieres on NBC'
+      },
+      {
+        y: 'b90e',
+        t: "The Handmaid's Tale premieres on Hulu"
+      },
 
       // More music milestones
-      { y: 'b958', t: "Queen releases the album A Night at the Opera" },
-      { y: 'b957', t: "The Eagles release the album Hotel California" },
-      { y: 'b956', t: "Fleetwood Mac releases the album Rumours" },
-      { y: 'b956', t: "Sex Pistols release Never Mind the Bollocks" },
-      { y: 'b953', t: "AC/DC releases the album Back in Black" },
-      { y: 'b92e', t: "Bruce Springsteen releases Born in the U.S.A." },
-      { y: 'b92d', t: "Madonna releases the album True Blue" },
-      { y: 'b92c', t: "George Michael releases the Faith album" },
-      { y: 'b924', t: "Alanis Morissette releases Jagged Little Pill" },
-      { y: 'b924', t: "Oasis releases (What's the Story) Morning Glory?" },
-      { y: 'b922', t: "Radiohead releases OK Computer" },
-      { y: 'b93f', t: "Linkin Park releases the album Hybrid Theory" },
-      { y: 'b939', t: "Amy Winehouse releases the album Back to Black" },
-      { y: 'b934', t: "Adele releases the album 21" },
-      { y: 'b930', t: "Adele releases the album 25" },
-      { y: 'b90f', t: "Beyoncé releases the visual album Lemonade" },
-      { y: 'b90a', t: "Adele releases the album 30" },
-      { y: 'b909', t: "Beyoncé releases the album Renaissance" },
+      {
+        y: 'b958',
+        t: "Queen releases the album A Night at the Opera"
+      },
+      {
+        y: 'b957',
+        t: "The Eagles release the album Hotel California"
+      },
+      {
+        y: 'b956',
+        t: "Fleetwood Mac releases the album Rumours"
+      },
+      {
+        y: 'b956',
+        t: "Sex Pistols release Never Mind the Bollocks"
+      },
+      {
+        y: 'b953',
+        t: "AC/DC releases the album Back in Black"
+      },
+      {
+        y: 'b92e',
+        t: "Bruce Springsteen releases Born in the U.S.A."
+      },
+      {
+        y: 'b92d',
+        t: "Madonna releases the album True Blue"
+      },
+      {
+        y: 'b92c',
+        t: "George Michael releases the Faith album"
+      },
+      {
+        y: 'b924',
+        t: "Alanis Morissette releases Jagged Little Pill"
+      },
+      {
+        y: 'b924',
+        t: "Oasis releases (What's the Story) Morning Glory?"
+      },
+      {
+        y: 'b922',
+        t: "Radiohead releases OK Computer"
+      },
+      {
+        y: 'b93f',
+        t: "Linkin Park releases the album Hybrid Theory"
+      },
+      {
+        y: 'b939',
+        t: "Amy Winehouse releases the album Back to Black"
+      },
+      {
+        y: 'b934',
+        t: "Adele releases the album 21"
+      },
+      {
+        y: 'b930',
+        t: "Adele releases the album 25"
+      },
+      {
+        y: 'b90f',
+        t: "Beyoncé releases the visual album Lemonade"
+      },
+      {
+        y: 'b90a',
+        t: "Adele releases the album 30"
+      },
+      {
+        y: 'b909',
+        t: "Beyoncé releases the album Renaissance"
+      },
 
       // More sport
-      { y: 'b943', t: 'Tokyo hosts the Summer Olympic Games' },
-      { y: 'b957', t: 'Innsbruck hosts the Winter Olympic Games' },
-      { y: 'b953', t: 'Lake Placid hosts the Winter Olympic Games' },
-      { y: 'b92f', t: 'Sarajevo hosts the Winter Olympic Games' },
-      { y: 'b927', t: 'Albertville hosts the Winter Olympic Games' },
-      { y: 'b959', t: 'West Germany wins the FIFA World Cup at home' },
-      { y: 'b955', t: 'Argentina wins its first FIFA World Cup at home' },
-      { y: 'b951', t: 'Italy wins the FIFA World Cup in Spain' },
-      { y: 'b92d', t: 'Argentina wins the FIFA World Cup with Diego Maradona in Mexico' },
-      { y: 'b929', t: 'West Germany wins the FIFA World Cup in Italy' },
-      { y: 'b925', t: 'Brazil wins the FIFA World Cup in the United States' },
-      { y: 'b93d', t: 'Brazil wins the FIFA World Cup in Japan and South Korea' },
-      { y: 'b939', t: 'Italy wins the FIFA World Cup in Germany' },
-      { y: 'b90d', t: 'France wins the FIFA World Cup in Russia' },
-      { y: 'b959', t: 'Muhammad Ali beats George Foreman in the Rumble in the Jungle' },
-      { y: 'b958', t: 'Muhammad Ali beats Joe Frazier in the Thrilla in Manila' },
-      { y: 'b928', t: 'Michael Jordan wins his first NBA title with the Chicago Bulls' },
-      { y: 'b923', t: 'The Chicago Bulls win a record 72 regular-season games' },
-      { y: 'b90f', t: 'LeBron James leads the Cleveland Cavaliers to their first NBA title' },
-      { y: 'b93c', t: 'Roger Federer wins his first Wimbledon title' },
-      { y: 'b932', t: 'Andy Murray wins his first Wimbledon title' },
-      { y: 'b950', t: "India wins its first Cricket World Cup at Lord's" },
-      { y: 'b934', t: 'India wins the ICC Cricket World Cup on home soil' },
-      { y: 'b92b', t: 'Ayrton Senna wins his first Formula 1 world championship' },
-      { y: 'b93b', t: 'Michael Schumacher wins his seventh F1 championship' },
-      { y: 'b90b', t: 'Lewis Hamilton wins his seventh F1 championship' },
-      { y: 'b938', t: 'David Beckham joins the LA Galaxy from Real Madrid' },
+      {
+        y: 'b943',
+        t: 'Tokyo hosts the Summer Olympic Games'
+      },
+      {
+        y: 'b957',
+        t: 'Innsbruck hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b953',
+        t: 'Lake Placid hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b92f',
+        t: 'Sarajevo hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b927',
+        t: 'Albertville hosts the Winter Olympic Games'
+      },
+      {
+        y: 'b959',
+        t: 'West Germany wins the FIFA World Cup at home'
+      },
+      {
+        y: 'b955',
+        t: 'Argentina wins its first FIFA World Cup at home'
+      },
+      {
+        y: 'b951',
+        t: 'Italy wins the FIFA World Cup in Spain'
+      },
+      {
+        y: 'b92d',
+        t: 'Argentina wins the FIFA World Cup with Diego Maradona in Mexico'
+      },
+      {
+        y: 'b929',
+        t: 'West Germany wins the FIFA World Cup in Italy'
+      },
+      {
+        y: 'b925',
+        t: 'Brazil wins the FIFA World Cup in the United States'
+      },
+      {
+        y: 'b93d',
+        t: 'Brazil wins the FIFA World Cup in Japan and South Korea'
+      },
+      {
+        y: 'b939',
+        t: 'Italy wins the FIFA World Cup in Germany'
+      },
+      {
+        y: 'b90d',
+        t: 'France wins the FIFA World Cup in Russia'
+      },
+      {
+        y: 'b959',
+        t: 'Muhammad Ali beats George Foreman in the Rumble in the Jungle'
+      },
+      {
+        y: 'b958',
+        t: 'Muhammad Ali beats Joe Frazier in the Thrilla in Manila'
+      },
+      {
+        y: 'b928',
+        t: 'Michael Jordan wins his first NBA title with the Chicago Bulls'
+      },
+      {
+        y: 'b923',
+        t: 'The Chicago Bulls win a record 72 regular-season games'
+      },
+      {
+        y: 'b90f',
+        t: 'LeBron James leads the Cleveland Cavaliers to their first NBA title'
+      },
+      {
+        y: 'b93c',
+        t: 'Roger Federer wins his first Wimbledon title'
+      },
+      {
+        y: 'b932',
+        t: 'Andy Murray wins his first Wimbledon title'
+      },
+      {
+        y: 'b950',
+        t: "India wins its first Cricket World Cup at Lord's"
+      },
+      {
+        y: 'b934',
+        t: 'India wins the ICC Cricket World Cup on home soil'
+      },
+      {
+        y: 'b92b',
+        t: 'Ayrton Senna wins his first Formula 1 world championship'
+      },
+      {
+        y: 'b93b',
+        t: 'Michael Schumacher wins his seventh F1 championship'
+      },
+      {
+        y: 'b90b',
+        t: 'Lewis Hamilton wins his seventh F1 championship'
+      },
+      {
+        y: 'b938',
+        t: 'David Beckham joins the LA Galaxy from Real Madrid'
+      },
 
       // More tech
-      { y: 'b956', t: 'The Atari 2600 video game console is released' },
-      { y: 'b923', t: 'Motorola releases the StarTAC flip phone' },
-      { y: 'b923', t: 'Hotmail launches as one of the first webmail services' },
-      { y: 'b921', t: 'Microsoft releases Windows 98' },
-      { y: 'b920', t: 'BlackBerry launches its first email pager' },
-      { y: 'b93d', t: 'LinkedIn launches' },
-      { y: 'b93a', t: 'Reddit is launched' },
-      { y: 'b937', t: 'Apple launches the App Store' },
-      { y: 'b936', t: 'WhatsApp is founded' },
-      { y: 'b934', t: 'Apple releases iCloud' },
-      { y: 'b933', t: 'Microsoft releases Windows 8' },
-      { y: 'b932', t: 'Google releases the first Chromecast' },
-      { y: 'b90e', t: 'The iPhone X is released, removing the home button' },
-      { y: 'b908', t: 'Microsoft launches the Bing AI chatbot' },
-      { y: 'b908', t: 'Threads launches as a rival to Twitter' },
+      {
+        y: 'b956',
+        t: 'The Atari 2600 video game console is released'
+      },
+      {
+        y: 'b923',
+        t: 'Motorola releases the StarTAC flip phone'
+      },
+      {
+        y: 'b923',
+        t: 'Hotmail launches as one of the first webmail services'
+      },
+      {
+        y: 'b921',
+        t: 'Microsoft releases Windows 98'
+      },
+      {
+        y: 'b920',
+        t: 'BlackBerry launches its first email pager'
+      },
+      {
+        y: 'b93d',
+        t: 'LinkedIn launches'
+      },
+      {
+        y: 'b93a',
+        t: 'Reddit is launched'
+      },
+      {
+        y: 'b937',
+        t: 'Apple launches the App Store'
+      },
+      {
+        y: 'b936',
+        t: 'WhatsApp is founded'
+      },
+      {
+        y: 'b934',
+        t: 'Apple releases iCloud'
+      },
+      {
+        y: 'b933',
+        t: 'Microsoft releases Windows 8'
+      },
+      {
+        y: 'b932',
+        t: 'Google releases the first Chromecast'
+      },
+      {
+        y: 'b90e',
+        t: 'The iPhone X is released, removing the home button'
+      },
+      {
+        y: 'b908',
+        t: 'Microsoft launches the Bing AI chatbot'
+      },
+      {
+        y: 'b908',
+        t: 'Threads launches as a rival to Twitter'
+      },
 
       // More science
-      { y: 'b94c', t: 'Jonas Salk develops the first effective polio vaccine' },
-      { y: 'b909', t: "NASA's DART spacecraft successfully deflects an asteroid" },
-      { y: 'b909', t: 'The James Webb Space Telescope releases its first images' },
-      { y: 'b908', t: 'SpaceX Starship makes its first integrated flight test' },
+      {
+        y: 'b94c',
+        t: 'Jonas Salk develops the first effective polio vaccine'
+      },
+      {
+        y: 'b909',
+        t: "NASA's DART spacecraft successfully deflects an asteroid"
+      },
+      {
+        y: 'b909',
+        t: 'The James Webb Space Telescope releases its first images'
+      },
+      {
+        y: 'b908',
+        t: 'SpaceX Starship makes its first integrated flight test'
+      },
 
       // More books
-      { y: 'b972', t: 'George Orwell publishes Nineteen Eighty-Four' },
-      { y: 'b971', t: 'C.S. Lewis publishes The Lion, the Witch and the Wardrobe' },
-      { y: 'b970', t: 'J.D. Salinger publishes The Catcher in the Rye' },
-      { y: 'b947', t: 'Harper Lee publishes To Kill a Mockingbird' },
-      { y: 'b95a', t: 'Kurt Vonnegut publishes Slaughterhouse-Five' },
-      { y: 'b959', t: 'Stephen King publishes his first novel, Carrie' },
-      { y: 'b954', t: "Douglas Adams publishes The Hitchhiker's Guide to the Galaxy" },
-      { y: 'b945', t: "Madeleine L'Engle publishes A Wrinkle in Time" },
-      { y: 'b934', t: 'E.L. James publishes Fifty Shades of Grey' },
+      {
+        y: 'b972',
+        t: 'George Orwell publishes Nineteen Eighty-Four'
+      },
+      {
+        y: 'b971',
+        t: 'C.S. Lewis publishes The Lion, the Witch and the Wardrobe'
+      },
+      {
+        y: 'b970',
+        t: 'J.D. Salinger publishes The Catcher in the Rye'
+      },
+      {
+        y: 'b947',
+        t: 'Harper Lee publishes To Kill a Mockingbird'
+      },
+      {
+        y: 'b95a',
+        t: 'Kurt Vonnegut publishes Slaughterhouse-Five'
+      },
+      {
+        y: 'b959',
+        t: 'Stephen King publishes his first novel, Carrie'
+      },
+      {
+        y: 'b954',
+        t: "Douglas Adams publishes The Hitchhiker's Guide to the Galaxy"
+      },
+      {
+        y: 'b945',
+        t: "Madeleine L'Engle publishes A Wrinkle in Time"
+      },
+      {
+        y: 'b934',
+        t: 'E.L. James publishes Fifty Shades of Grey'
+      },
 
       // More royal & culture
-      { y: 'b976', t: 'The United Nations is founded' },
-      { y: 'b90e', t: 'Prince Harry and Meghan Markle announce their engagement' },
-      { y: 'b90c', t: 'Meghan Markle gives birth to Archie Harrison' },
-      { y: 'b90a', t: 'Meghan Markle gives birth to Lilibet Mountbatten-Windsor' },
+      {
+        y: 'b976',
+        t: 'The United Nations is founded'
+      },
+      {
+        y: 'b90e',
+        t: 'Prince Harry and Meghan Markle announce their engagement'
+      },
+      {
+        y: 'b90c',
+        t: 'Meghan Markle gives birth to Archie Harrison'
+      },
+      {
+        y: 'b90a',
+        t: 'Meghan Markle gives birth to Lilibet Mountbatten-Windsor'
+      },
     ];
 
     const MAX_WORDS = 20;
@@ -1823,55 +3736,87 @@
     }
 
     const SCORES_KEY = 'whatYear.highScores.v1';
+    const SURVIVAL_KEY = 'whatYear.survival.v1';
+    const SURVIVAL_LIMIT = 200;
     const SCORES_LIMIT = 10;
 
-    function loadScores() {
+    function loadScoresFor(key) {
       try {
-        const parsed = JSON.parse(localStorage.getItem(SCORES_KEY) || '[]');
+        const parsed = JSON.parse(localStorage.getItem(key) || '[]');
         return Array.isArray(parsed) ? parsed : [];
       } catch (e) {
         return [];
       }
     }
 
-    function recordScore(totalOff) {
-      const entry = { totalOff, date: new Date().toISOString() };
-      const scores = loadScores();
+    function recordScore() {
+      const isSurvival = state.mode === 'survival';
+      const key = isSurvival ? SURVIVAL_KEY : SCORES_KEY;
+      const entry = isSurvival ?
+        {
+          questionsLasted: state.history.length,
+          totalOff: state.totalOff,
+          date: new Date().toISOString()
+        } :
+        {
+          totalOff: state.totalOff,
+          date: new Date().toISOString()
+        };
+      const scores = loadScoresFor(key);
       scores.push(entry);
-      scores.sort((a, b) => a.totalOff - b.totalOff);
+      if (isSurvival) {
+        // Higher questions = better; break ties on lower total years off.
+        scores.sort((a, b) => (b.questionsLasted - a.questionsLasted) || (a.totalOff - b.totalOff));
+      } else {
+        scores.sort((a, b) => a.totalOff - b.totalOff);
+      }
       const top = scores.slice(0, SCORES_LIMIT);
       try {
-        localStorage.setItem(SCORES_KEY, JSON.stringify(top));
-      } catch (e) { /* storage unavailable — display still works from memory */ }
-      return { top, entry };
+        localStorage.setItem(key, JSON.stringify(top));
+      } catch (e) {}
+      return {
+        top,
+        entry
+      };
     }
 
     function renderScores(top, currentEntry) {
+      const isSurvival = state.mode === 'survival';
       const list = $('#high-scores-list');
+      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 200 years mode' : 'Top 10 best scores';
       list.innerHTML = '';
       if (!top.length) {
         list.innerHTML = '<li class="empty">No scores yet — this one starts the board.</li>';
         return;
       }
-      const best = top[0].totalOff;
+      const getValue = s => isSurvival ? s.questionsLasted : s.totalOff;
+      const best = getValue(top[0]);
       const fmt = new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       });
       top.forEach((s, i) => {
         const li = document.createElement('li');
-        if (currentEntry && s.date === currentEntry.date && s.totalOff === currentEntry.totalOff) {
+        if (currentEntry && s.date === currentEntry.date && getValue(s) === getValue(currentEntry)) {
           li.classList.add('current');
         }
-        // Bar length shows relative score: best = 100%, worse = proportionally shorter.
-        const pct = ((best + 1) / (s.totalOff + 1)) * 100;
+        // Survival: higher questionsLasted = better, classic: lower totalOff = better. Best run always draws full width.
+        const value = getValue(s);
+        const pct = isSurvival ?
+          ((value + 1) / (best + 1)) * 100 :
+          ((best + 1) / (value + 1)) * 100;
         li.style.setProperty('--pct', pct.toFixed(1) + '%');
         const rank = document.createElement('span');
         rank.className = 'rank';
         rank.textContent = `${i + 1}.`;
         const score = document.createElement('span');
         score.className = 'score';
-        score.textContent = `${s.totalOff} ${s.totalOff === 1 ? 'yr' : 'yrs'} off`;
+        score.textContent = isSurvival ?
+          `${value} ${value === 1 ? 'question' : 'questions'}` :
+          `${value} ${value === 1 ? 'yr' : 'yrs'} off`;
         const date = document.createElement('span');
         date.className = 'date';
         date.textContent = fmt.format(new Date(s.date));
@@ -1889,13 +3834,28 @@
 
     // ---- game state ----
     const state = {
+      mode: 'classic', // or 'survival'
       questions: [],
       index: 0,
       totalOff: 0,
       lastGuess: null,
       lastDiff: 0,
       history: [],
+      fetchingMore: false,
     };
+
+    function dedupeQuestions(arr, existing = []) {
+      const seen = new Set();
+      for (const q of existing) {
+        seen.add(((q.title || '') + '|' + (q.subtitle || '')).toLowerCase());
+      }
+      return arr.filter(q => {
+        const key = (q.title + '|' + (q.subtitle || '')).toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
 
     const $ = (sel) => document.querySelector(sel);
 
@@ -1904,9 +3864,26 @@
       $(id).classList.add('active');
     }
 
+    function updateSurvivalBar() {
+      const bar = $('#survival-bar');
+      const fill = $('#survival-bar-fill');
+      if (state.mode !== 'survival') {
+        bar.hidden = true;
+        return;
+      }
+      bar.hidden = false;
+      const pct = Math.min(100, (state.totalOff / SURVIVAL_LIMIT) * 100);
+      fill.style.width = pct.toFixed(2) + '%';
+    }
+
     function renderQuestion() {
       const q = state.questions[state.index];
-      $('#q-counter').textContent = `Question ${state.index + 1} of ${state.questions.length}`;
+      const isSurvival = state.mode === 'survival';
+      $('#q-counter').textContent = isSurvival ?
+        `Question ${state.index + 1}` :
+        `Question ${state.index + 1} of ${state.questions.length}`;
+      $('#survival-banner').hidden = !isSurvival;
+      updateSurvivalBar();
       $('#q-prompt').textContent = q.prompt;
       $('#q-title').textContent = q.title;
       $('#q-subtitle').textContent = q.subtitle || '';
@@ -1918,7 +3895,9 @@
       const artworkImg = $('#q-artwork');
       if (q.artwork) {
         artworkImg.src = q.artwork;
-        artworkImg.onerror = () => { delete iconWrap.dataset.hasArtwork; };
+        artworkImg.onerror = () => {
+          delete iconWrap.dataset.hasArtwork;
+        };
         iconWrap.dataset.hasArtwork = 'true';
       } else {
         delete iconWrap.dataset.hasArtwork;
@@ -1933,6 +3912,56 @@
       const slider = $('#year-slider');
       slider.value = 1980;
       $('#year-value').textContent = '1980';
+    }
+
+    function fireExplosion(cb) {
+      const container = document.createElement('div');
+      container.className = 'explosion-container';
+
+      const flash = document.createElement('div');
+      flash.className = 'explosion-flash';
+      container.appendChild(flash);
+
+      const ring = document.createElement('div');
+      ring.className = 'explosion-ring';
+      container.appendChild(ring);
+
+      const ring2 = document.createElement('div');
+      ring2.className = 'explosion-ring';
+      ring2.style.animationDelay = '0.15s';
+      ring2.style.borderColor = 'var(--accent-2)';
+      container.appendChild(ring2);
+
+      const colors = ['#ffcb47', '#ff7ac6', '#5fd39d', '#7cc4ff', '#c58bff', '#ffffff'];
+      for (let i = 0; i < 60; i++) {
+        const p = document.createElement('span');
+        p.className = 'explosion-particle';
+        const angle = (i / 60) * Math.PI * 2 + (Math.random() * 0.3 - 0.15);
+        const dist = 200 + Math.random() * 350;
+        p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        const size = 10 + Math.random() * 12;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.animationDelay = (Math.random() * 0.15) + 's';
+        container.appendChild(p);
+      }
+
+      const text = document.createElement('div');
+      text.className = 'explosion-text';
+      text.textContent = '💥 BOOM!';
+      container.appendChild(text);
+
+      document.body.appendChild(container);
+
+      // Show the end screen a moment before the explosion finishes so it fades nicely into it.
+      setTimeout(() => {
+        cb && cb();
+        container.style.transition = 'opacity 0.4s ease';
+        container.style.opacity = '0';
+        setTimeout(() => container.remove(), 400);
+      }, 1400);
     }
 
     function fireConfetti() {
@@ -1970,7 +3999,14 @@
       state.totalOff += diff;
       state.lastGuess = guess;
       state.lastDiff = diff;
-      state.history.push({ title: q.title, subtitle: q.subtitle || '', guess, year: q.year, diff });
+      state.history.push({
+        title: q.title,
+        subtitle: q.subtitle || '',
+        guess,
+        year: q.year,
+        diff
+      });
+      updateSurvivalBar();
 
       $('#reveal-guess').textContent = guess;
       $('#reveal-year').textContent = q.year;
@@ -2000,13 +4036,44 @@
       else if (state.lastDiff > 50) showReaction('Seriously? 😂');
     }
 
-    function nextQuestion() {
+    async function nextQuestion() {
+      // Survival mode: once the player's total years off crosses the threshold, detonate.
+      if (state.mode === 'survival' && state.totalOff >= SURVIVAL_LIMIT) {
+        fireExplosion(() => showEnd());
+        return;
+      }
       state.index++;
       if (state.index >= state.questions.length) {
-        showEnd();
-      } else {
-        renderQuestion();
+        if (state.mode === 'survival') {
+          // Survived past our pre-fetched buffer — try one more batch before giving up.
+          try {
+            const more = dedupeQuestions(await buildGame(10), state.questions);
+            if (!more.length) {
+              showEnd();
+              return;
+            }
+            state.questions.push(...more);
+          } catch (e) {
+            showEnd();
+            return;
+          }
+        } else {
+          showEnd();
+          return;
+        }
       }
+      // Top up the pool in the background when we're getting close to the end of it.
+      if (state.mode === 'survival' && !state.fetchingMore &&
+        state.index >= state.questions.length - 5) {
+        state.fetchingMore = true;
+        buildGame(10).then(more => {
+          state.questions.push(...dedupeQuestions(more, state.questions));
+          state.fetchingMore = false;
+        }).catch(() => {
+          state.fetchingMore = false;
+        });
+      }
+      renderQuestion();
     }
 
     const PERFECT_MESSAGES = {
@@ -2027,7 +4094,9 @@
       const perfects = state.history.filter(h => h.diff === 0);
       const count = perfects.length;
       $('#perfect-count').textContent = count;
-      $('#perfect-message').textContent = PERFECT_MESSAGES[count] || '';
+      $('#perfect-total').textContent = state.history.length;
+      $('#perfect-message').textContent = PERFECT_MESSAGES[count] ||
+        (count > 0 ? `${count} spot-on guesses — fantastic run.` : PERFECT_MESSAGES[0]);
 
       const list = $('#perfects-list');
       list.innerHTML = '';
@@ -2064,24 +4133,45 @@
 
     function showEnd() {
       show('#end-screen');
-      $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
+      const isSurvival = state.mode === 'survival';
+      if (isSurvival) {
+        $('#end-heading').textContent = '💥 Boom!';
+        const q = state.history.length;
+        $('#end-total').innerHTML = `You lasted <strong>${q} ${q === 1 ? 'question' : 'questions'}</strong> before hitting 200 years off.`;
+      } else {
+        $('#end-heading').textContent = 'Game over';
+        const y = state.totalOff;
+        $('#end-total').innerHTML = `You were off by <strong>${y} ${y === 1 ? 'year' : 'years'}</strong> across 10 guesses.`;
+      }
       $('#fun-fact-text').textContent = getFunFact(state.totalOff);
       renderPerfects();
       renderRecap();
       $('#recap').hidden = true;
       $('#recap-toggle').hidden = false;
-      const { top, entry } = recordScore(state.totalOff);
+      const {
+        top,
+        entry
+      } = recordScore();
       renderScores(top, entry);
     }
 
-    async function startGame() {
+    async function startGame(mode = 'classic') {
       show('#loading-screen');
+      state.mode = mode;
       state.questions = [];
       state.index = 0;
       state.totalOff = 0;
       state.history = [];
+      state.fetchingMore = false;
       try {
-        const qs = await buildGame(10);
+        let qs;
+        if (mode === 'survival') {
+          // Pre-build a buffer of ~30 questions; nextQuestion() will top up in the background if needed.
+          const batches = await Promise.all([buildGame(10), buildGame(10), buildGame(10)]);
+          qs = dedupeQuestions(batches.flat());
+        } else {
+          qs = await buildGame(10);
+        }
         if (qs.length < 5) throw new Error('Could not load enough questions. Check your connection?');
         state.questions = qs;
         show('#question-screen');
@@ -2102,8 +4192,9 @@
 
     // ---- wire up ----
     document.addEventListener('DOMContentLoaded', () => {
-      $('#start-btn').addEventListener('click', startGame);
-      $('#replay-btn').addEventListener('click', startGame);
+      $('#start-btn').addEventListener('click', () => startGame('classic'));
+      $('#start-survival-btn').addEventListener('click', () => startGame('survival'));
+      $('#replay-btn').addEventListener('click', () => show('#start-screen'));
       $('#submit-btn').addEventListener('click', submitGuess);
       $('#reveal-toggle').addEventListener('click', revealAnswer);
       $('#recap-toggle').addEventListener('click', () => {
