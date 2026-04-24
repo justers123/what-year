@@ -960,7 +960,7 @@
       <p class="tagline">Guess the year famous albums, films and historical events happened. 10 questions, one big fun fact.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
       <button id="start-survival-btn" class="btn-secondary">200 years mode</button>
-      <p class="mode-blurb muted">10-question quiz · or survive as long as you can before racking up 200 years off the correct year.</p>
+      <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 200 years.</p>
     </section>
 
     <section id="loading-screen" class="screen">
@@ -3752,16 +3752,14 @@
     function recordScore() {
       const isSurvival = state.mode === 'survival';
       const key = isSurvival ? SURVIVAL_KEY : SCORES_KEY;
-      const entry = isSurvival ?
-        {
-          questionsLasted: state.history.length,
-          totalOff: state.totalOff,
-          date: new Date().toISOString()
-        } :
-        {
-          totalOff: state.totalOff,
-          date: new Date().toISOString()
-        };
+      const entry = isSurvival ? {
+        questionsLasted: state.history.length,
+        totalOff: state.totalOff,
+        date: new Date().toISOString()
+      } : {
+        totalOff: state.totalOff,
+        date: new Date().toISOString()
+      };
       const scores = loadScoresFor(key);
       scores.push(entry);
       if (isSurvival) {
