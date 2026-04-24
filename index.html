@@ -4348,7 +4348,7 @@
         } else {
           qs = await buildGame(10);
         }
-        if (qs.length < 5) throw new Error('Could not load enough questions. Check your connection?');
+        if (qs.length < 5) throw new Error('Could not load enough questions. Check your connection??');
         state.questions = qs;
         show('#question-screen');
         renderQuestion();
