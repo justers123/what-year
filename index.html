@@ -45,12 +45,31 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
     #app {
-      min-height: 100%;
+      flex: 1 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
+    }
+
+    .attribution {
+      flex: 0 0 auto;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding: 14px 16px 22px;
+      opacity: 0.65;
+    }
+
+    .attribution a {
+      color: inherit;
+      text-decoration: underline;
     }
 
     .screen {
@@ -176,8 +195,11 @@
     }
 
     #q-icon-wrap {
-      width: 100%;
+      width: 62%;
+      max-width: 220px;
       aspect-ratio: 1 / 1;
+      margin: 22px auto 4px;
+      border-radius: 16px;
       background: linear-gradient(135deg, rgba(255, 122, 198, 0.12), rgba(255, 203, 71, 0.12));
       display: flex;
       align-items: center;
@@ -197,6 +219,21 @@
     #q-icon-wrap[data-kind="film"] .q-icon[data-kind="film"],
     #q-icon-wrap[data-kind="history"] .q-icon[data-kind="history"] {
       display: block;
+    }
+
+    .q-artwork {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    #q-icon-wrap[data-has-artwork="true"] .q-artwork {
+      display: block;
+    }
+
+    #q-icon-wrap[data-has-artwork="true"] .q-icon {
+      display: none !important;
     }
 
     .q-icon svg {
@@ -306,6 +343,28 @@
     }
 
     .reveal.hidden {
+      display: none;
+    }
+
+    .reveal-itunes {
+      display: inline-block;
+      margin: 0 0 16px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      transition: color 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .reveal-itunes:hover {
+      color: var(--fg);
+      border-color: var(--fg);
+      transform: translateY(-1px);
+    }
+
+    .reveal-itunes[hidden] {
       display: none;
     }
 
@@ -571,6 +630,7 @@
 
       <div class="q-card">
         <div id="q-icon-wrap" data-kind="album" aria-hidden="true">
+          <img id="q-artwork" class="q-artwork" alt="" />
           <div class="q-icon" data-kind="album">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="9"></circle>
@@ -612,6 +672,7 @@
       <div id="reveal" class="reveal hidden">
         <p class="reveal-answer">The answer was <strong id="reveal-year"></strong></p>
         <p class="reveal-diff">You were off by <strong id="reveal-diff"></strong></p>
+        <a id="reveal-itunes-link" class="reveal-itunes" target="_blank" rel="noopener" hidden>View on iTunes</a>
         <button id="next-btn" class="btn-primary">Next</button>
       </div>
     </section>
@@ -631,6 +692,10 @@
     </section>
   </main>
 
+  <footer class="attribution">
+    Music and film data <a href="https://www.apple.com/itunes/" target="_blank" rel="noopener">powered by iTunes</a>.
+  </footer>
+
   <script>
     const MAX_YEAR = new Date().getFullYear();
     const MIN_YEAR = 1900;
@@ -639,10 +704,17 @@
     // (attribute=artistTerm) and pick a random album. Keeps the pool recognisable
     // without hard-coding specific titles.
     const ALBUM_ARTISTS = [
+      // Rock & roll pioneers
+      'Chuck Berry', 'Little Richard', 'Buddy Holly', 'Roy Orbison',
+      'Jerry Lee Lewis', 'Fats Domino', 'The Everly Brothers', 'Bo Diddley',
+      'Ricky Nelson',
       // 60s / 70s rock legends
       'The Beatles', 'The Rolling Stones', 'Bob Dylan', 'Jimi Hendrix', 'The Beach Boys',
       'The Who', 'The Doors', 'Simon & Garfunkel', 'Creedence Clearwater Revival',
       'The Kinks', 'The Monkees', 'The Bee Gees', 'The Band', 'Grateful Dead',
+      'The Moody Blues', 'King Crimson', 'Emerson Lake & Palmer', 'Traffic',
+      'The Mamas and the Papas', 'Three Dog Night', 'Sly and the Family Stone',
+      'Crosby Stills Nash & Young', 'America', 'Bread',
       'Led Zeppelin', 'Pink Floyd', 'Queen', 'David Bowie', 'Fleetwood Mac',
       'Eagles', 'Aerosmith', 'Neil Young', 'Tom Petty', 'Lynyrd Skynyrd',
       'Rod Stewart', 'Van Morrison', 'Joni Mitchell', 'James Taylor',
@@ -650,11 +722,23 @@
       'Boston', 'Journey', 'Foreigner', 'Supertramp',
       'Yes', 'Rush', 'Electric Light Orchestra', 'Wings',
       'Peter Gabriel', 'Cream', 'Eric Clapton', 'Jethro Tull',
+      'Heart', 'Styx', 'Kansas', 'REO Speedwagon',
+      'Huey Lewis and the News', 'ZZ Top', 'Cheap Trick',
+      'Bad Company', 'Thin Lizzy',
+      // Beatles solo
+      'Paul McCartney', 'John Lennon', 'George Harrison', 'Ringo Starr',
+      // Singer-songwriters
+      'Leonard Cohen', 'Paul Simon', 'Don McLean', 'Gordon Lightfoot', 'John Denver',
       // Hard rock / metal
       'AC/DC', 'Black Sabbath', 'Deep Purple', 'Van Halen', 'Bon Jovi',
       'Iron Maiden', 'Ozzy Osbourne', 'Kiss', 'Metallica', 'Guns N Roses',
       'Judas Priest', 'Def Leppard', 'Motley Crue', 'Scorpions',
       'Motörhead', 'Megadeth', 'Slayer',
+      'Poison', 'Whitesnake', 'Europe', 'Anthrax', 'Dio',
+      'Twisted Sister', 'Ratt', 'Quiet Riot',
+      'Rage Against the Machine', 'System of a Down', 'Tool', 'Faith No More',
+      'Nickelback', 'Creed', 'Disturbed', 'Limp Bizkit', 'Korn', 'Slipknot',
+      'Avenged Sevenfold', 'Linkin Park',
       // Soul / Motown / R&B / funk
       'Stevie Wonder', 'Marvin Gaye', 'Aretha Franklin', 'Ray Charles',
       'James Brown', 'Diana Ross', 'Tina Turner',
@@ -664,15 +748,30 @@
       'The Isley Brothers', 'Curtis Mayfield', 'Barry White',
       'Donna Summer', 'Gloria Gaynor', 'Sade', 'Luther Vandross',
       'The Jackson 5', 'The Supremes',
+      "The O'Jays", 'Chaka Khan', 'Patti LaBelle', 'Natalie Cole',
+      'Roberta Flack', 'Aaliyah', 'Toni Braxton', 'En Vogue', 'SWV',
+      'Brandy', 'Monica', 'Ciara', 'Seal', 'Jamiroquai',
+      'Erykah Badu', 'Jill Scott', 'India.Arie',
+      'Ne-Yo', 'Chris Brown', 'Pharrell Williams',
       // Country / standards
       'Elvis Presley', 'Frank Sinatra', 'Johnny Cash', 'Dolly Parton',
       'Willie Nelson', 'Kenny Rogers', 'Glen Campbell', 'Kris Kristofferson',
       'Garth Brooks', 'George Strait', 'Reba McEntire',
       'Faith Hill', 'Tim McGraw', 'Alan Jackson', 'Carrie Underwood',
-      // Jazz / blues
+      'Patsy Cline', 'Loretta Lynn', 'Tammy Wynette', 'Merle Haggard',
+      'Waylon Jennings', 'Brooks & Dunn', 'LeAnn Rimes', 'Martina McBride',
+      'The Chicks', 'Zac Brown Band', 'Keith Urban', 'Brad Paisley',
+      'Luke Bryan', 'Miranda Lambert', 'Chris Stapleton', 'Kacey Musgraves',
+      'Jason Aldean', 'Blake Shelton', 'Trisha Yearwood', 'Vince Gill',
+      'Rascal Flatts', 'Lady A', 'Morgan Wallen',
+      // Jazz / blues / standards
       'Louis Armstrong', 'Nat King Cole', 'Ella Fitzgerald',
       'Billie Holiday', 'Duke Ellington', 'Miles Davis',
       'BB King', 'Nina Simone',
+      'Herbie Hancock', 'Dave Brubeck', 'John Coltrane',
+      'Michael Bublé', 'Diana Krall', 'Harry Connick Jr.', 'Tony Bennett',
+      'John Lee Hooker', 'Muddy Waters', 'Stevie Ray Vaughan',
+      'Buddy Guy', 'Bonnie Raitt',
       // 70s / 80s pop & rock
       'ABBA', 'Bob Marley', 'Elton John', 'Billy Joel', 'Phil Collins',
       'Genesis', 'Santana', 'The Police', 'Dire Straits', 'Bruce Springsteen', 'U2',
@@ -682,6 +781,11 @@
       'Duran Duran', 'Depeche Mode', 'The Cure', 'Eurythmics',
       'Pet Shop Boys', 'New Order', 'Joy Division', 'The Smiths',
       'Cyndi Lauper', 'George Michael', 'Cher', 'Lionel Richie', 'Hall & Oates',
+      'A-ha', 'Tears for Fears', 'Culture Club', 'Simply Red',
+      'Wham!', 'Human League', 'Spandau Ballet', 'Thompson Twins',
+      'Soft Cell', 'INXS', 'Men at Work', 'Level 42', 'Roxette',
+      'Mike Oldfield', 'Kate Bush', "Sinéad O'Connor", 'Chris de Burgh',
+      'Enya', "The B-52's", 'Devo',
       // 80s / 90s pop icons
       'Michael Jackson', 'Prince', 'Madonna', 'Whitney Houston',
       'Mariah Carey', 'Janet Jackson', 'Celine Dion',
@@ -690,9 +794,20 @@
       'Green Day', 'Weezer', 'Blur', 'Oasis', 'Radiohead', 'R.E.M.',
       'Soundgarden', 'Alice in Chains', 'Stone Temple Pilots',
       'Smashing Pumpkins', 'Beastie Boys', 'The Stone Roses',
+      'Third Eye Blind', 'Matchbox Twenty', 'Hootie & the Blowfish',
+      'Counting Crows', 'Goo Goo Dolls', 'Sheryl Crow', 'Smash Mouth',
+      'Jewel', 'No Doubt', 'The Cranberries', 'Bush', 'Garbage',
+      'Sixpence None the Richer', 'Sublime', '311', 'Collective Soul',
+      'Lenny Kravitz',
       // 90s / 00s pop
       'Spice Girls', 'Backstreet Boys', 'NSYNC', 'Britney Spears',
       'Christina Aguilera', 'Shania Twain', 'Shakira', 'Alanis Morissette',
+      // 00s indie / Britpop
+      'The Verve', 'Franz Ferdinand', 'Stereophonics', 'Travis', 'Keane',
+      'Interpol', 'Kasabian', 'The National', 'Death Cab for Cutie',
+      'Modest Mouse', 'Feist', 'Wilco',
+      // 00s singer-songwriters
+      'John Mayer', 'Jason Mraz', 'Jack Johnson', 'Sara Bareilles', 'Norah Jones',
       // Hip-hop & R&B
       'Tupac', 'Notorious B.I.G.', 'Snoop Dogg', 'Jay-Z', 'Eminem', 'Dr. Dre',
       'Outkast', '50 Cent', 'Kanye West',
@@ -700,6 +815,12 @@
       'Lauryn Hill', 'TLC', "Destiny's Child", 'Boyz II Men',
       'Mary J. Blige', 'Alicia Keys', 'John Legend', 'Lil Wayne',
       'Missy Elliott',
+      'Salt-N-Pepa', 'MC Hammer', 'Will Smith', 'Queen Latifah',
+      'Nicki Minaj', 'Cardi B', 'Megan Thee Stallion', 'Ludacris',
+      'Nelly', 'T-Pain', 'Akon', 'Flo Rida', 'Lil Nas X', 'J. Cole',
+      'Post Malone', 'Travis Scott', 'Tyler The Creator', 'Childish Gambino',
+      'Wiz Khalifa', 'A Tribe Called Quest', 'Common', 'Ice Cube',
+      'Busta Rhymes',
       // 00s pop / alt
       'Coldplay', 'Amy Winehouse', 'Beyoncé', 'Rihanna', 'Arctic Monkeys',
       'Gorillaz', 'The White Stripes', 'Usher', 'Justin Timberlake', 'Pink',
@@ -709,10 +830,22 @@
       'Black Eyed Peas', 'Maroon 5', 'Imagine Dragons',
       'Fall Out Boy', 'My Chemical Romance', 'Paramore',
       'Twenty One Pilots',
-      // Current stars
+      // Current pop stars
       'Adele', 'Taylor Swift', 'Drake', 'Kendrick Lamar',
       'Ed Sheeran', 'Billie Eilish', 'Bruno Mars', 'Harry Styles',
       'Dua Lipa', 'The Weeknd',
+      'Kylie Minogue', 'Lady Gaga', 'Katy Perry', 'Ariana Grande',
+      'Selena Gomez', 'Miley Cyrus', 'Demi Lovato', 'Jennifer Lopez',
+      'Gloria Estefan', 'Ricky Martin', 'Enrique Iglesias',
+      'Jonas Brothers', 'One Direction', 'Sam Smith', 'Olivia Rodrigo',
+      'Doja Cat', 'Halsey', 'Charlie Puth', 'Shawn Mendes', 'Camila Cabello',
+      'Sia', 'Robbie Williams', 'Take That', 'Westlife', 'S Club 7',
+      // Electronic / dance
+      'Jean-Michel Jarre', 'Kraftwerk', 'Moby', 'The Prodigy',
+      'Fatboy Slim', 'The Chemical Brothers', 'Massive Attack',
+      'Portishead', 'Calvin Harris', 'David Guetta', 'Avicii',
+      // Reggae & world
+      'Peter Tosh', 'Jimmy Cliff', 'Björk',
     ];
     const MOVIE_SEEDS = [
       'man', 'last', 'night', 'star', 'dark', 'great', 'hero', 'return',
@@ -725,6 +858,8 @@
     const REISSUE_RE = /\b(remaster|remastered|deluxe|anniversary|reissue|expanded|bonus|re-?release|collector|edition)\b/i;
     // iTunes tags non-album releases with a trailing " - EP" or " - Single" in the collection name.
     const NON_ALBUM_RE = /\s-\s(EP|Single)\s*$/i;
+    // Skip live records — their release year is the recording date, not the songs' original year.
+    const LIVE_RE = /\b(live|unplugged|in\s*concert)\b/i;
 
     // Curated, instantly-recognisable historical events. Years are obfuscated
     // (XOR 0xBEEF, hex) so they can't be read at a glance when inspecting the source
@@ -881,6 +1016,162 @@
       { y: 'b90c', t: 'Avengers: Endgame is released, becoming a box-office phenomenon' },
       { y: 'b90b', t: 'Parasite wins Best Picture at the Academy Awards' },
       { y: 'b908', t: '"Barbenheimer" takes over cinemas as Barbie and Oppenheimer release on the same day' },
+
+      // More science & discovery
+      { y: 'b967', t: 'Alexander Fleming discovers penicillin' },
+      { y: 'b94e', t: 'James Watson and Francis Crick publish the structure of DNA' },
+      { y: 'b947', t: 'The oral contraceptive pill is approved by the US FDA' },
+      { y: 'b940', t: 'Christiaan Barnard performs the first successful human heart transplant' },
+      { y: 'b955', t: 'Louise Brown is born, the world\'s first "test tube baby"' },
+      { y: 'b95e', t: 'ARPANET, the forerunner of the Internet, sends its first message' },
+      { y: 'b95a', t: 'NASA launches the Skylab space station' },
+      { y: 'b957', t: 'Viking 1 becomes the first spacecraft to successfully land on Mars' },
+      { y: 'b92a', t: 'Voyager 2 completes its grand tour of the outer planets' },
+      { y: 'b93c', t: 'The Human Genome Project is completed' },
+      { y: 'b90d', t: "SpaceX launches Falcon Heavy with Elon Musk's Tesla Roadster as payload" },
+      { y: 'b90c', t: 'The first image of a black hole is released by the Event Horizon Telescope' },
+
+      // More technology
+      { y: 'b956', t: 'Apple releases the Apple II personal computer' },
+      { y: 'b951', t: 'Time magazine names the personal computer "Machine of the Year"' },
+      { y: 'b928', t: 'Linus Torvalds releases the first version of the Linux kernel' },
+      { y: 'b926', t: 'The Mosaic web browser is released, popularising the internet' },
+      { y: 'b925', t: 'Jeff Bezos founds Amazon.com in a Seattle garage' },
+      { y: 'b924', t: 'eBay is founded in California' },
+      { y: 'b93c', t: 'Apple launches the iTunes Music Store' },
+      { y: 'b93b', t: 'Google launches Gmail' },
+      { y: 'b939', t: 'Nintendo launches the Wii console' },
+      { y: 'b938', t: 'Amazon releases the Kindle e-reader' },
+      { y: 'b938', t: 'Netflix launches its video streaming service' },
+      { y: 'b937', t: 'Spotify launches its music service in Sweden' },
+      { y: 'b934', t: 'Spotify launches in the United States' },
+      { y: 'b931', t: 'Amazon releases the Echo smart speaker with Alexa' },
+      { y: 'b931', t: 'Facebook acquires WhatsApp' },
+      { y: 'b930', t: 'Apple Music is launched' },
+      { y: 'b90c', t: 'Disney+ launches as a streaming service' },
+      { y: 'b909', t: 'Elon Musk completes his acquisition of Twitter' },
+      { y: 'b908', t: 'Twitter is rebranded as X by Elon Musk' },
+
+      // More games & consoles
+      { y: 'b95b', t: 'Atari releases Pong, the first commercially successful video game' },
+      { y: 'b953', t: 'Namco releases Pac-Man in arcades' },
+      { y: 'b93e', t: 'Microsoft releases the first Xbox console' },
+      { y: 'b93a', t: 'Microsoft releases the Xbox 360' },
+      { y: 'b932', t: 'Sony releases the PlayStation 4' },
+      { y: 'b932', t: 'Microsoft releases the Xbox One' },
+
+      // More TV & streaming
+      { y: 'b944', t: 'Doctor Who first airs on the BBC' },
+      { y: 'b95e', t: 'Sesame Street premieres on PBS' },
+      { y: 'b958', t: 'Saturday Night Live premieres on NBC' },
+      { y: 'b952', t: 'Only Fools and Horses first airs on the BBC' },
+      { y: 'b92e', t: 'EastEnders first airs on the BBC' },
+      { y: 'b92a', t: 'Seinfeld premieres on NBC' },
+      { y: 'b921', t: 'Seinfeld airs its final episode, watched by 76 million Americans' },
+      { y: 'b922', t: 'The Teletubbies debut on BBC television' },
+      { y: 'b93a', t: 'The Office premieres on NBC in the United States' },
+      { y: 'b932', t: 'Netflix releases its first original series, House of Cards' },
+      { y: 'b90f', t: 'Stranger Things premieres on Netflix' },
+      { y: 'b90c', t: 'Game of Thrones airs its much-debated final episode' },
+      { y: 'b90c', t: 'The Mandalorian introduces Baby Yoda to the world' },
+      { y: 'b90a', t: 'Squid Game becomes a global Netflix phenomenon' },
+
+      // More film
+      { y: 'b97e', t: 'Disney releases Snow White and the Seven Dwarfs, the first animated feature film' },
+      { y: 'b97c', t: 'The Wizard of Oz is released' },
+      { y: 'b945', t: 'Dr. No, the first James Bond film, is released' },
+      { y: 'b958', t: 'Jaws is released and defines the summer blockbuster' },
+      { y: 'b957', t: 'Rocky is released in cinemas' },
+      { y: 'b955', t: 'Grease is released in cinemas' },
+      { y: 'b951', t: 'E.T. the Extra-Terrestrial is released' },
+      { y: 'b92f', t: 'Ghostbusters is released in cinemas' },
+      { y: 'b92e', t: 'Back to the Future is released' },
+      { y: 'b92b', t: 'Die Hard is released' },
+      { y: 'b92a', t: "Tim Burton's Batman is released in cinemas" },
+      { y: 'b92a', t: 'The Little Mermaid revives Disney animation' },
+      { y: 'b928', t: 'Beauty and the Beast is released by Disney' },
+      { y: 'b927', t: 'Aladdin is released by Disney' },
+      { y: 'b926', t: 'Jurassic Park dominates the summer box office' },
+      { y: 'b925', t: 'The Lion King is released by Disney' },
+      { y: 'b925', t: 'Pulp Fiction is released in cinemas' },
+      { y: 'b925', t: 'Forrest Gump is released in cinemas' },
+      { y: 'b923', t: 'Independence Day dominates the summer box office' },
+      { y: 'b93c', t: 'Finding Nemo is released by Pixar' },
+      { y: 'b937', t: 'Iron Man kicks off the Marvel Cinematic Universe' },
+      { y: 'b935', t: 'Christopher Nolan releases Inception in cinemas' },
+      { y: 'b935', t: 'Toy Story 3 is released by Pixar' },
+      { y: 'b932', t: 'Disney releases Frozen, a global phenomenon' },
+      { y: 'b930', t: 'Star Wars: The Force Awakens is released' },
+      { y: 'b90e', t: 'Wonder Woman is released in cinemas' },
+      { y: 'b90d', t: "Marvel's Black Panther is released in cinemas" },
+      { y: 'b90b', t: "Pixar's Soul is released" },
+      { y: 'b909', t: 'Top Gun: Maverick is released' },
+
+      // More music milestones
+      { y: 'b940', t: "The Beatles release Sgt. Pepper's Lonely Hearts Club Band" },
+      { y: 'b95e', t: 'The Beatles give their final public performance on the Apple HQ rooftop' },
+      { y: 'b95d', t: 'The Beatles officially announce their break-up' },
+      { y: 'b95a', t: 'Pink Floyd releases the album The Dark Side of the Moon' },
+      { y: 'b954', t: 'Pink Floyd releases the album The Wall' },
+      { y: 'b951', t: 'Michael Jackson releases the Thriller album' },
+      { y: 'b92f', t: 'Prince releases the album Purple Rain' },
+      { y: 'b92f', t: 'Band Aid records "Do They Know It\'s Christmas?"' },
+      { y: 'b92c', t: 'U2 releases The Joshua Tree album' },
+      { y: 'b928', t: 'Nirvana releases the album Nevermind' },
+      { y: 'b923', t: 'The Spice Girls release "Wannabe" as their debut single' },
+      { y: 'b920', t: 'Napster launches and disrupts the music industry' },
+      { y: 'b931', t: 'Taylor Swift releases her album 1989' },
+
+      // More sport
+      { y: 'b95d', t: 'Brazil wins its third FIFA World Cup in Mexico' },
+      { y: 'b957', t: 'Montreal hosts the Summer Olympic Games' },
+      { y: 'b925', t: 'Lillehammer hosts the Winter Olympic Games' },
+      { y: 'b921', t: 'Nagano hosts the Winter Olympic Games' },
+      { y: 'b93d', t: 'Salt Lake City hosts the Winter Olympic Games' },
+      { y: 'b939', t: 'Germany hosts the FIFA World Cup' },
+      { y: 'b939', t: 'Turin hosts the Winter Olympic Games' },
+      { y: 'b935', t: 'Vancouver hosts the Winter Olympic Games' },
+      { y: 'b935', t: 'Spain wins the FIFA World Cup in South Africa' },
+      { y: 'b931', t: 'Sochi hosts the Winter Olympic Games' },
+      { y: 'b90f', t: 'The Chicago Cubs win the World Series, ending a 108-year drought' },
+      { y: 'b90e', t: 'The New England Patriots complete the greatest Super Bowl comeback, 28-3' },
+      { y: 'b90d', t: 'PyeongChang hosts the Winter Olympic Games' },
+      { y: 'b90c', t: 'Tiger Woods wins the Masters after 11 years without a major' },
+      { y: 'b909', t: 'Beijing hosts the Winter Olympic Games' },
+
+      // More royal & UK culture
+      { y: 'b974', t: 'Princess Elizabeth marries Prince Philip at Westminster Abbey' },
+      { y: 'b95a', t: 'The United Kingdom joins the European Economic Community' },
+      { y: 'b951', t: 'Prince William is born in London' },
+      { y: 'b92f', t: 'Prince Harry is born in London' },
+      { y: 'b93d', t: 'The UK celebrates the Golden Jubilee of Queen Elizabeth II' },
+      { y: 'b930', t: 'Princess Charlotte is born to William and Catherine' },
+      { y: 'b90d', t: 'Prince Louis is born to William and Catherine' },
+
+      // More culture & everyday life
+      { y: 'b973', t: 'The National Health Service is founded in the United Kingdom' },
+      { y: 'b971', t: 'The Peanuts comic strip debuts in US newspapers' },
+      { y: 'b94c', t: "McDonald's Corporation is founded by Ray Kroc" },
+      { y: 'b94a', t: 'Dr. Seuss publishes The Cat in the Hat' },
+      { y: 'b948', t: 'The Barbie doll is introduced by Mattel' },
+      { y: 'b95c', t: 'Starbucks opens its first store in Seattle' },
+      { y: 'b95c', t: 'Greenpeace is founded in Vancouver' },
+      { y: 'b95a', t: 'The Sydney Opera House officially opens' },
+      { y: 'b955', t: 'Garfield the cat comic strip debuts' },
+      { y: 'b92e', t: 'Calvin and Hobbes debuts in newspapers' },
+      { y: 'b93f', t: 'The Tate Modern opens in London' },
+      { y: 'b93c', t: 'Dan Brown publishes The Da Vinci Code' },
+      { y: 'b93c', t: 'Concorde makes its final commercial flight' },
+      { y: 'b93a', t: 'Stephenie Meyer publishes the first Twilight novel' },
+      { y: 'b937', t: 'The first Hunger Games novel is published' },
+      { y: 'b933', t: 'The Shard opens in London, Europe\'s tallest building at the time' },
+      { y: 'b931', t: 'The Ice Bucket Challenge raises millions for ALS research' },
+
+      // More literature
+      { y: 'b94d', t: 'J.R.R. Tolkien publishes The Fellowship of the Ring' },
+
+      // More politics
+      { y: 'b936', t: 'Barack Obama is inaugurated as President of the United States' },
     ];
 
     const MAX_WORDS = 20;
@@ -904,6 +1195,8 @@
           if (NON_ALBUM_RE.test(r.collectionName)) return null;
           if (r.collectionType && r.collectionType !== 'Album') return null;
           if (typeof r.trackCount === 'number' && r.trackCount < 7) return null;
+          // Skip live albums — their release year doesn't match the songs' era.
+          if (LIVE_RE.test(r.collectionName)) return null;
           // Require an exact artist match — artistTerm is fuzzy and will return
           // unrelated acts whose names happen to contain the search term (e.g.
           // "Tupac Martir" when searching "Tupac").
@@ -916,6 +1209,8 @@
             prompt: 'Album',
             title: r.collectionName,
             subtitle: r.artistName,
+            artwork: (r.artworkUrl100 || '').replace(/100x100bb/g, '600x600bb'),
+            itunesUrl: r.collectionViewUrl || '',
           };
         }).filter(Boolean);
       } catch (e) {
@@ -941,6 +1236,8 @@
             prompt: 'Film',
             title: r.trackName,
             subtitle: r.artistName ? `Directed by ${r.artistName}` : '',
+            artwork: (r.artworkUrl100 || '').replace(/100x100bb/g, '600x600bb'),
+            itunesUrl: r.trackViewUrl || '',
           };
         }).filter(Boolean);
       } catch (e) {
@@ -1086,7 +1383,20 @@
       $('#q-prompt').textContent = q.prompt;
       $('#q-title').textContent = q.title;
       $('#q-subtitle').textContent = q.subtitle || '';
-      $('#q-icon-wrap').dataset.kind = q.kind || 'history';
+
+      const iconWrap = $('#q-icon-wrap');
+      iconWrap.dataset.kind = q.kind || 'history';
+
+      // Swap the category icon for the actual cover art when iTunes gave us one.
+      const artworkImg = $('#q-artwork');
+      if (q.artwork) {
+        artworkImg.src = q.artwork;
+        artworkImg.onerror = () => { delete iconWrap.dataset.hasArtwork; };
+        iconWrap.dataset.hasArtwork = 'true';
+      } else {
+        delete iconWrap.dataset.hasArtwork;
+        artworkImg.removeAttribute('src');
+      }
 
       $('#reveal').classList.add('hidden');
       $('#guess-panel').style.display = '';
@@ -1135,6 +1445,16 @@
 
       $('#reveal-year').textContent = q.year;
       $('#reveal-diff').textContent = diff === 0 ? 'nothing — perfect!' : `${diff} ${diff === 1 ? 'year' : 'years'}`;
+
+      const itunesLink = $('#reveal-itunes-link');
+      if (q.itunesUrl) {
+        itunesLink.href = q.itunesUrl;
+        itunesLink.hidden = false;
+      } else {
+        itunesLink.hidden = true;
+        itunesLink.removeAttribute('href');
+      }
+
       $('#guess-panel').style.display = 'none';
       $('#reveal').classList.remove('hidden');
       $('#q-score').textContent = `Total off: ${state.totalOff} years`;
