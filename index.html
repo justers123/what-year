@@ -368,24 +368,49 @@
       display: none;
     }
 
+    .reveal-guess {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .reveal-guess strong {
+      color: var(--fg);
+      font-size: 1.25rem;
+      margin-left: 4px;
+    }
+
+    .reveal-toggle {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      margin: 0 0 16px;
+      transition: color 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .reveal-toggle:hover {
+      color: var(--fg);
+      border-color: var(--fg);
+      transform: translateY(-1px);
+    }
+
+    .reveal-toggle[hidden] {
+      display: none;
+    }
+
     .reveal-answer {
       font-size: 1.1rem;
-      margin: 0 0 6px;
+      margin: 0 0 18px;
     }
 
     .reveal-answer strong {
       color: var(--accent);
       font-size: 1.6rem;
-    }
-
-    .reveal-diff {
-      margin: 0 0 18px;
-      color: var(--muted);
-    }
-
-    .reveal-diff strong {
-      color: var(--fg);
-      font-size: 1.3rem;
     }
 
     #next-btn {
@@ -503,6 +528,81 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 6px;
+    }
+
+    .recap-toggle {
+      margin: 0 0 22px;
+    }
+
+    .recap[hidden] {
+      display: none;
+    }
+
+    .recap {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin: 0 0 24px;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    .recap h3 {
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+
+    .recap ol {
+      list-style: none;
+      counter-reset: recap;
+      padding: 0;
+      margin: 0;
+    }
+
+    .recap li {
+      counter-increment: recap;
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 10px;
+      align-items: baseline;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .recap li + li {
+      margin-top: 4px;
+    }
+
+    .recap .rank::before {
+      content: counter(recap) ".";
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .recap .title {
+      color: var(--fg);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .recap .result {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: right;
+    }
+
+    .recap .result strong {
+      color: var(--fg);
+      margin-right: 6px;
     }
 
     .high-scores {
@@ -625,7 +725,6 @@
     <section id="question-screen" class="screen">
       <div class="q-header">
         <span id="q-counter">Question 1 of 10</span>
-        <span id="q-score">Total off: 0 years</span>
       </div>
 
       <div class="q-card">
@@ -670,8 +769,9 @@
       </div>
 
       <div id="reveal" class="reveal hidden">
-        <p class="reveal-answer">The answer was <strong id="reveal-year"></strong></p>
-        <p class="reveal-diff">You were off by <strong id="reveal-diff"></strong></p>
+        <p class="reveal-guess">Your guess: <strong id="reveal-guess"></strong></p>
+        <button id="reveal-toggle" class="reveal-toggle" type="button">Show answer</button>
+        <p id="reveal-answer-wrap" class="reveal-answer" hidden>The answer was <strong id="reveal-year"></strong></p>
         <a id="reveal-itunes-link" class="reveal-itunes" target="_blank" rel="noopener" hidden>View on iTunes</a>
         <button id="next-btn" class="btn-primary">Next</button>
       </div>
@@ -683,6 +783,11 @@
       <div id="fun-fact" class="fun-fact">
         <span class="label">Fun fact</span>
         <span id="fun-fact-text">Loading...</span>
+      </div>
+      <button id="recap-toggle" class="reveal-toggle recap-toggle" type="button">Show breakdown</button>
+      <div id="recap" class="recap" hidden>
+        <h3>This game</h3>
+        <ol id="recap-list"></ol>
       </div>
       <div id="high-scores" class="high-scores">
         <h3>Top 10 best scores</h3>
@@ -1367,6 +1472,8 @@
       index: 0,
       totalOff: 0,
       lastGuess: null,
+      lastDiff: 0,
+      history: [],
     };
 
     const $ = (sel) => document.querySelector(sel);
@@ -1379,7 +1486,6 @@
     function renderQuestion() {
       const q = state.questions[state.index];
       $('#q-counter').textContent = `Question ${state.index + 1} of ${state.questions.length}`;
-      $('#q-score').textContent = `Total off: ${state.totalOff} years`;
       $('#q-prompt').textContent = q.prompt;
       $('#q-title').textContent = q.title;
       $('#q-subtitle').textContent = q.subtitle || '';
@@ -1442,9 +1548,16 @@
       const diff = Math.abs(guess - q.year);
       state.totalOff += diff;
       state.lastGuess = guess;
+      state.lastDiff = diff;
+      state.history.push({ title: q.title, subtitle: q.subtitle || '', guess, year: q.year, diff });
 
+      $('#reveal-guess').textContent = guess;
       $('#reveal-year').textContent = q.year;
-      $('#reveal-diff').textContent = diff === 0 ? 'nothing — perfect!' : `${diff} ${diff === 1 ? 'year' : 'years'}`;
+
+      // Hide the answer behind a toggle so replaying users can't memorise years by seeing them each time.
+      $('#reveal-answer-wrap').hidden = true;
+      const toggle = $('#reveal-toggle');
+      toggle.hidden = false;
 
       const itunesLink = $('#reveal-itunes-link');
       if (q.itunesUrl) {
@@ -1457,10 +1570,13 @@
 
       $('#guess-panel').style.display = 'none';
       $('#reveal').classList.remove('hidden');
-      $('#q-score').textContent = `Total off: ${state.totalOff} years`;
+    }
 
-      if (diff === 0) fireConfetti();
-      else if (diff > 50) showReaction('Seriously? 😂');
+    function revealAnswer() {
+      $('#reveal-answer-wrap').hidden = false;
+      $('#reveal-toggle').hidden = true;
+      if (state.lastDiff === 0) fireConfetti();
+      else if (state.lastDiff > 50) showReaction('Seriously? 😂');
     }
 
     function nextQuestion() {
@@ -1472,10 +1588,33 @@
       }
     }
 
+    function renderRecap() {
+      const list = $('#recap-list');
+      list.innerHTML = '';
+      state.history.forEach(h => {
+        const li = document.createElement('li');
+        const rank = document.createElement('span');
+        rank.className = 'rank';
+        const title = document.createElement('span');
+        title.className = 'title';
+        title.textContent = h.title;
+        const result = document.createElement('span');
+        result.className = 'result';
+        const year = document.createElement('strong');
+        year.textContent = h.year;
+        result.append(year, document.createTextNode(`${h.diff} off`));
+        li.append(rank, title, result);
+        list.appendChild(li);
+      });
+    }
+
     function showEnd() {
       show('#end-screen');
       $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
       $('#fun-fact-text').textContent = getFunFact(state.totalOff);
+      renderRecap();
+      $('#recap').hidden = true;
+      $('#recap-toggle').hidden = false;
       const { top, entry } = recordScore(state.totalOff);
       renderScores(top, entry);
     }
@@ -1485,6 +1624,7 @@
       state.questions = [];
       state.index = 0;
       state.totalOff = 0;
+      state.history = [];
       try {
         const qs = await buildGame(10);
         if (qs.length < 5) throw new Error('Could not load enough questions. Check your connection?');
@@ -1510,6 +1650,11 @@
       $('#start-btn').addEventListener('click', startGame);
       $('#replay-btn').addEventListener('click', startGame);
       $('#submit-btn').addEventListener('click', submitGuess);
+      $('#reveal-toggle').addEventListener('click', revealAnswer);
+      $('#recap-toggle').addEventListener('click', () => {
+        $('#recap').hidden = false;
+        $('#recap-toggle').hidden = true;
+      });
       $('#next-btn').addEventListener('click', nextQuestion);
       $('#year-slider').addEventListener('input', (e) => {
         $('#year-value').textContent = e.target.value;
