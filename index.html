@@ -534,6 +534,61 @@
       margin: 0 0 22px;
     }
 
+    .perfect-stat {
+      font-size: 1rem;
+      margin: 4px 0 6px;
+    }
+
+    .perfect-stat strong {
+      display: block;
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 2px 0;
+    }
+
+    .perfect-message {
+      margin: 0 0 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .perfects-toggle {
+      margin: 0 0 18px;
+    }
+
+    .perfects-list {
+      list-style: none;
+      padding: 14px 20px;
+      margin: 0 0 22px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      text-align: left;
+      box-shadow: var(--shadow);
+      font-size: 0.92rem;
+    }
+
+    .perfects-list[hidden] {
+      display: none;
+    }
+
+    .perfects-list li {
+      padding: 8px 0;
+    }
+
+    .perfects-list li + li {
+      border-top: 1px solid var(--card-border);
+    }
+
+    .perfects-list .year {
+      color: var(--accent);
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
     .recap[hidden] {
       display: none;
     }
@@ -780,6 +835,10 @@
     <section id="end-screen" class="screen">
       <h1>Game over</h1>
       <p class="total">You were off by<strong id="total-years">0 years</strong>across 10 guesses.</p>
+      <p class="perfect-stat"><strong id="perfect-count">0</strong>out of 10 exactly right.</p>
+      <p id="perfect-message" class="perfect-message muted"></p>
+      <button id="perfects-toggle" class="reveal-toggle perfects-toggle" type="button" hidden>Show which</button>
+      <ul id="perfects-list" class="perfects-list" hidden></ul>
       <div id="fun-fact" class="fun-fact">
         <span class="label">Fun fact</span>
         <span id="fun-fact-text">Loading...</span>
@@ -1588,6 +1647,44 @@
       }
     }
 
+    const PERFECT_MESSAGES = {
+      0: 'Not a single direct hit this time — plenty of close calls though.',
+      1: 'One spot-on guess! The rest were just warm-ups.',
+      2: 'Two bullseyes — nicely done.',
+      3: "Three perfect guesses — you've got a feel for the timeline.",
+      4: 'Four spot-on — seriously sharp.',
+      5: 'Half the questions exact — impressive work.',
+      6: 'Six out of ten nailed — you really know your eras.',
+      7: "Seven perfect guesses — are you sure you're not cheating?",
+      8: 'Eight out of ten — outstanding!',
+      9: 'Nine perfect — one short of a clean sweep!',
+      10: "Ten out of ten! You're a walking encyclopedia of years.",
+    };
+
+    function renderPerfects() {
+      const perfects = state.history.filter(h => h.diff === 0);
+      const count = perfects.length;
+      $('#perfect-count').textContent = count;
+      $('#perfect-message').textContent = PERFECT_MESSAGES[count] || '';
+
+      const list = $('#perfects-list');
+      list.innerHTML = '';
+      perfects.forEach(p => {
+        const li = document.createElement('li');
+        const text = p.subtitle ? `${p.title} — ${p.subtitle}` : p.title;
+        li.appendChild(document.createTextNode(text));
+        const year = document.createElement('span');
+        year.className = 'year';
+        year.textContent = p.year;
+        li.appendChild(year);
+        list.appendChild(li);
+      });
+
+      // No toggle if there's nothing to show.
+      $('#perfects-toggle').hidden = count === 0;
+      $('#perfects-list').hidden = true;
+    }
+
     function renderRecap() {
       const list = $('#recap-list');
       list.innerHTML = '';
@@ -1612,6 +1709,7 @@
       show('#end-screen');
       $('#total-years').textContent = `${state.totalOff} ${state.totalOff === 1 ? 'year' : 'years'}`;
       $('#fun-fact-text').textContent = getFunFact(state.totalOff);
+      renderPerfects();
       renderRecap();
       $('#recap').hidden = true;
       $('#recap-toggle').hidden = false;
@@ -1654,6 +1752,10 @@
       $('#recap-toggle').addEventListener('click', () => {
         $('#recap').hidden = false;
         $('#recap-toggle').hidden = true;
+      });
+      $('#perfects-toggle').addEventListener('click', () => {
+        $('#perfects-list').hidden = false;
+        $('#perfects-toggle').hidden = true;
       });
       $('#next-btn').addEventListener('click', nextQuestion);
       $('#year-slider').addEventListener('input', (e) => {
