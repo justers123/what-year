@@ -926,10 +926,17 @@
       text-align: right;
     }
 
-    .high-scores .empty {
+    .high-scores li.empty {
+      display: block;
+      background: transparent;
       color: var(--muted);
       font-size: 0.9rem;
-      margin: 0;
+      padding: 10px 4px;
+      text-align: center;
+    }
+
+    .high-scores li.empty::before {
+      content: none;
     }
 
     .error {
@@ -939,6 +946,128 @@
       padding: 12px 16px;
       border-radius: 12px;
       margin-bottom: 14px;
+    }
+
+    .leaderboards-btn {
+      display: inline-block;
+      margin-top: 18px;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.15s ease;
+    }
+
+    .leaderboards-btn:hover {
+      color: var(--accent);
+    }
+
+    .modal[hidden] {
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 8, 20, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
+
+    .modal-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 22px 20px 18px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: var(--shadow);
+      max-height: 85vh;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .modal-card h2 {
+      margin: 0 0 14px;
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color 0.15s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--fg);
+    }
+
+    .leaderboard-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .lb-tab {
+      flex: 1;
+      appearance: none;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .lb-tab:hover {
+      color: var(--fg);
+    }
+
+    .lb-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #1a1330;
+    }
+
+    .modal-scores {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
     }
 
     @media (max-width: 480px) {
@@ -961,6 +1090,7 @@
       <button id="start-btn" class="btn-primary">Start game</button>
       <button id="start-survival-btn" class="btn-secondary">100 years mode</button>
       <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 100 years.</p>
+      <button id="view-leaderboards-btn" class="leaderboards-btn" type="button">View leaderboards</button>
     </section>
 
     <section id="loading-screen" class="screen">
@@ -1050,6 +1180,21 @@
       <button id="replay-btn" class="btn-primary">Play again</button>
     </section>
   </main>
+
+  <div id="leaderboards-modal" class="modal" hidden aria-hidden="true" role="dialog" aria-labelledby="leaderboards-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <button class="modal-close" type="button" aria-label="Close" data-close>×</button>
+      <h2 id="leaderboards-title">Leaderboards</h2>
+      <div class="leaderboard-tabs" role="tablist">
+        <button class="lb-tab active" data-mode="classic" type="button" role="tab" aria-selected="true">10-question</button>
+        <button class="lb-tab" data-mode="survival" type="button" role="tab" aria-selected="false">100 years</button>
+      </div>
+      <div class="high-scores modal-scores">
+        <ol id="modal-scores-list"></ol>
+      </div>
+    </div>
+  </div>
 
   <footer class="attribution">
     Music and film data <a href="https://www.apple.com/itunes/" target="_blank" rel="noopener">powered by iTunes</a>.
@@ -3778,17 +3923,17 @@
       };
     }
 
-    function renderScores(top, currentEntry) {
-      const isSurvival = state.mode === 'survival';
-      const list = $('#high-scores-list');
-      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 100 years mode' : 'Top 10 best scores';
-      list.innerHTML = '';
-      if (!top.length) {
-        list.innerHTML = '<li class="empty">No scores yet — this one starts the board.</li>';
+    function renderScoresInto(listEl, scores, isSurvival, currentEntry, emptyMessage) {
+      listEl.innerHTML = '';
+      if (!scores.length) {
+        const li = document.createElement('li');
+        li.className = 'empty';
+        li.textContent = emptyMessage || 'No scores yet — play a game to start the board.';
+        listEl.appendChild(li);
         return;
       }
       const getValue = s => isSurvival ? s.questionsLasted : s.totalOff;
-      const best = getValue(top[0]);
+      const best = getValue(scores[0]);
       const fmt = new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
         month: 'short',
@@ -3796,7 +3941,7 @@
         hour: '2-digit',
         minute: '2-digit',
       });
-      top.forEach((s, i) => {
+      scores.forEach((s, i) => {
         const li = document.createElement('li');
         if (currentEntry && s.date === currentEntry.date && getValue(s) === getValue(currentEntry)) {
           li.classList.add('current');
@@ -3819,8 +3964,39 @@
         date.className = 'date';
         date.textContent = fmt.format(new Date(s.date));
         li.append(rank, score, date);
-        list.appendChild(li);
+        listEl.appendChild(li);
       });
+    }
+
+    function renderScores(top, currentEntry) {
+      const isSurvival = state.mode === 'survival';
+      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 100 years mode' : 'Top 10 best scores';
+      renderScoresInto($('#high-scores-list'), top, isSurvival, currentEntry, 'No scores yet — this one starts the board.');
+    }
+
+    function renderLeaderboardModal(mode) {
+      const isSurvival = mode === 'survival';
+      const key = isSurvival ? SURVIVAL_KEY : SCORES_KEY;
+      const scores = loadScoresFor(key);
+      renderScoresInto($('#modal-scores-list'), scores, isSurvival);
+      document.querySelectorAll('.lb-tab').forEach(tab => {
+        const active = tab.dataset.mode === mode;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function openLeaderboards() {
+      const modal = $('#leaderboards-modal');
+      modal.hidden = false;
+      modal.setAttribute('aria-hidden', 'false');
+      renderLeaderboardModal('classic');
+    }
+
+    function closeLeaderboards() {
+      const modal = $('#leaderboards-modal');
+      modal.hidden = true;
+      modal.setAttribute('aria-hidden', 'true');
     }
 
     function getFunFact(n) {
@@ -4207,6 +4383,17 @@
       $('#year-slider').addEventListener('input', (e) => {
         $('#year-value').textContent = e.target.value;
         $('#submit-btn').disabled = false;
+      });
+
+      $('#view-leaderboards-btn').addEventListener('click', openLeaderboards);
+      $('#leaderboards-modal').addEventListener('click', (e) => {
+        if (e.target.dataset.close !== undefined) closeLeaderboards();
+      });
+      document.querySelectorAll('.lb-tab').forEach(tab => {
+        tab.addEventListener('click', () => renderLeaderboardModal(tab.dataset.mode));
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !$('#leaderboards-modal').hidden) closeLeaderboards();
       });
 
       const slider = $('#year-slider');
