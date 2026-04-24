@@ -583,11 +583,6 @@
       border-top: 1px solid var(--card-border);
     }
 
-    .perfects-list .year {
-      color: var(--accent);
-      font-weight: 700;
-      margin-left: 6px;
-    }
 
     .recap[hidden] {
       display: none;
@@ -2038,12 +2033,7 @@
       list.innerHTML = '';
       perfects.forEach(p => {
         const li = document.createElement('li');
-        const text = p.subtitle ? `${p.title} — ${p.subtitle}` : p.title;
-        li.appendChild(document.createTextNode(text));
-        const year = document.createElement('span');
-        year.className = 'year';
-        year.textContent = p.year;
-        li.appendChild(year);
+        li.textContent = p.subtitle ? `${p.title} — ${p.subtitle}` : p.title;
         list.appendChild(li);
       });
 
