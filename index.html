@@ -155,7 +155,8 @@
       padding: 12px 22px;
       border-radius: 999px;
       cursor: pointer;
-      margin-top: 12px;
+      display: block;
+      margin: 12px auto 0;
       transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
     }
 
@@ -332,6 +333,135 @@
     #q-subtitle {
       margin: 0;
       font-size: 0.95rem;
+    }
+
+    .q-pair {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .q-pair[hidden] {
+      display: none;
+    }
+
+    .q-pair-header {
+      padding: 14px 18px 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .q-pair-item {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 14px;
+      padding: 16px 18px;
+      align-items: center;
+    }
+
+    .q-pair-icon-wrap {
+      width: 84px;
+      height: 84px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 122, 198, 0.12), rgba(255, 203, 71, 0.12));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .q-pair-artwork {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .q-pair-icon-wrap[data-has-artwork="true"] .q-pair-artwork {
+      display: block;
+    }
+
+    .q-pair-icon-wrap[data-has-artwork="true"] .q-pair-icon {
+      display: none !important;
+    }
+
+    .q-pair-icon {
+      display: none;
+      width: 50%;
+      height: 50%;
+      color: var(--accent);
+    }
+
+    .q-pair-icon-wrap[data-kind="album"] .q-pair-icon[data-kind="album"],
+    .q-pair-icon-wrap[data-kind="film"] .q-pair-icon[data-kind="film"],
+    .q-pair-icon-wrap[data-kind="history"] .q-pair-icon[data-kind="history"] {
+      display: block;
+    }
+
+    .q-pair-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .q-pair-text {
+      min-width: 0;
+    }
+
+    .q-pair-prompt {
+      margin: 0 0 4px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .q-pair-title {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .q-pair-subtitle {
+      margin: 0;
+      font-size: 0.82rem;
+    }
+
+    .q-pair-divider {
+      position: relative;
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 0;
+    }
+
+    .q-pair-divider::before,
+    .q-pair-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 32%;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    .q-pair-divider::before {
+      left: 6%;
+    }
+
+    .q-pair-divider::after {
+      right: 6%;
     }
 
     .year-input {
@@ -1068,7 +1198,8 @@
       <p class="tagline">Guess the year famous albums, films and historical events happened.</p>
       <button id="start-btn" class="btn-primary">Start game</button>
       <button id="start-survival-btn" class="btn-secondary">100 years mode</button>
-      <p class="mode-blurb muted">Play a 10-question gauntlet to hunt for the lowest score, or try to stay alive in Survival Mode before your errors total 100 years.</p>
+      <button id="start-diff-btn" class="btn-secondary">Year difference mode</button>
+      <p class="mode-blurb muted">Play a 10-question gauntlet for the lowest score, stay alive in Survival Mode until your errors total 100 years, or guess the gap in years between two events.</p>
       <button id="view-leaderboards-btn" class="leaderboards-btn" type="button">View leaderboards</button>
     </section>
 
@@ -1086,7 +1217,7 @@
         <div id="survival-bar-fill" class="survival-bar-fill"></div>
       </div>
 
-      <div class="q-card">
+      <div id="q-card-single" class="q-card">
         <div id="q-icon-wrap" data-kind="album" aria-hidden="true">
           <img id="q-artwork" class="q-artwork" alt="" />
           <div class="q-icon" data-kind="album">
@@ -1117,12 +1248,77 @@
         </div>
       </div>
 
+      <div id="q-pair-card" class="q-pair" hidden>
+        <div class="q-pair-header">How many years apart?</div>
+        <div id="q-pair-item-a" class="q-pair-item">
+          <div class="q-pair-icon-wrap" data-kind="album" aria-hidden="true">
+            <img class="q-pair-artwork" alt="" />
+            <div class="q-pair-icon" data-kind="album">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <circle cx="12" cy="12" r="2.2"></circle>
+                <path d="M12 3a9 9 0 0 1 9 9"></path>
+                <path d="M12 21a9 9 0 0 1-9-9"></path>
+              </svg>
+            </div>
+            <div class="q-pair-icon" data-kind="film">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <path d="M3 9h18M3 15h18M8 4v16M16 4v16"></path>
+              </svg>
+            </div>
+            <div class="q-pair-icon" data-kind="history">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15.5 14"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="q-pair-text">
+            <p class="q-pair-prompt"></p>
+            <h3 class="q-pair-title"></h3>
+            <p class="q-pair-subtitle muted"></p>
+          </div>
+        </div>
+        <div class="q-pair-divider">and</div>
+        <div id="q-pair-item-b" class="q-pair-item">
+          <div class="q-pair-icon-wrap" data-kind="album" aria-hidden="true">
+            <img class="q-pair-artwork" alt="" />
+            <div class="q-pair-icon" data-kind="album">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <circle cx="12" cy="12" r="2.2"></circle>
+                <path d="M12 3a9 9 0 0 1 9 9"></path>
+                <path d="M12 21a9 9 0 0 1-9-9"></path>
+              </svg>
+            </div>
+            <div class="q-pair-icon" data-kind="film">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <path d="M3 9h18M3 15h18M8 4v16M16 4v16"></path>
+              </svg>
+            </div>
+            <div class="q-pair-icon" data-kind="history">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15.5 14"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="q-pair-text">
+            <p class="q-pair-prompt"></p>
+            <h3 class="q-pair-title"></h3>
+            <p class="q-pair-subtitle muted"></p>
+          </div>
+        </div>
+      </div>
+
       <div id="guess-panel" class="year-input">
-        <label for="year-slider">Your guess: <span id="year-value">1980</span></label>
+        <label for="year-slider"><span id="year-slider-prompt">Your guess:</span> <span id="year-value">1980</span></label>
         <input type="range" id="year-slider" min="1900" max="2026" value="1980" />
         <div class="range-labels">
-          <span>1900</span>
-          <span>2026</span>
+          <span id="year-slider-label-min">1900</span>
+          <span id="year-slider-label-max">2026</span>
         </div>
         <button id="submit-btn" class="btn-primary">Submit</button>
       </div>
@@ -1164,6 +1360,7 @@
       <div class="leaderboard-tabs" role="tablist">
         <button class="lb-tab active" data-mode="classic" type="button" role="tab" aria-selected="true">10-question</button>
         <button class="lb-tab" data-mode="survival" type="button" role="tab" aria-selected="false">100 years</button>
+        <button class="lb-tab" data-mode="diff" type="button" role="tab" aria-selected="false">Year diff</button>
       </div>
       <div class="high-scores modal-scores">
         <ol id="modal-scores-list"></ol>
@@ -3892,8 +4089,26 @@
 
     const SCORES_KEY = 'whatYear.highScores.v1';
     const SURVIVAL_KEY = 'whatYear.survival.v2';
+    const DIFF_KEY = 'whatYear.diff.v1';
     const SURVIVAL_LIMIT = 100;
     const SCORES_LIMIT = 10;
+
+    function scoreKeyForMode(mode) {
+      if (mode === 'survival') return SURVIVAL_KEY;
+      if (mode === 'diff') return DIFF_KEY;
+      return SCORES_KEY;
+    }
+
+    async function buildDiffGame(n = 10) {
+      // Need 2 events per question — pull two batches of singles and pair them up.
+      const batches = await Promise.all([buildGame(n), buildGame(n)]);
+      const events = dedupeQuestions(batches.flat());
+      const pairs = [];
+      for (let i = 0; i + 1 < events.length && pairs.length < n; i += 2) {
+        pairs.push({ a: events[i], b: events[i + 1] });
+      }
+      return pairs;
+    }
 
     function loadScoresFor(key) {
       try {
@@ -3906,7 +4121,7 @@
 
     function recordScore() {
       const isSurvival = state.mode === 'survival';
-      const key = isSurvival ? SURVIVAL_KEY : SCORES_KEY;
+      const key = scoreKeyForMode(state.mode);
       const entry = isSurvival ? {
         questionsLasted: state.history.length,
         totalOff: state.totalOff,
@@ -3980,13 +4195,17 @@
 
     function renderScores(top, currentEntry) {
       const isSurvival = state.mode === 'survival';
-      $('#high-scores-title').textContent = isSurvival ? 'Top 10 — 100 years mode' : 'Top 10 best scores';
+      const isDiff = state.mode === 'diff';
+      const title = isSurvival ? 'Top 10 — 100 years mode'
+        : isDiff ? 'Top 10 — Year difference mode'
+        : 'Top 10 best scores';
+      $('#high-scores-title').textContent = title;
       renderScoresInto($('#high-scores-list'), top, isSurvival, currentEntry, 'No scores yet — this one starts the board.');
     }
 
     function renderLeaderboardModal(mode) {
       const isSurvival = mode === 'survival';
-      const key = isSurvival ? SURVIVAL_KEY : SCORES_KEY;
+      const key = scoreKeyForMode(mode);
       const scores = loadScoresFor(key);
       renderScoresInto($('#modal-scores-list'), scores, isSurvival);
       document.querySelectorAll('.lb-tab').forEach(tab => {
@@ -4053,25 +4272,16 @@
       fill.style.width = pct.toFixed(2) + '%';
     }
 
-    function renderQuestion() {
-      const q = state.questions[state.index];
-      const isSurvival = state.mode === 'survival';
-      $('#q-counter').textContent = isSurvival ?
-        `Question ${state.index + 1}` :
-        `Question ${state.index + 1} of ${state.questions.length}`;
-      $('#survival-banner').hidden = !isSurvival;
-      updateSurvivalBar();
-      $('#q-prompt').textContent = q.prompt;
-      $('#q-title').textContent = q.title;
-      $('#q-subtitle').textContent = q.subtitle || '';
-
-      const iconWrap = $('#q-icon-wrap');
-      iconWrap.dataset.kind = q.kind || 'history';
-
-      // Swap the category icon for the actual cover art when iTunes gave us one.
-      const artworkImg = $('#q-artwork');
-      if (q.artwork) {
-        artworkImg.src = q.artwork;
+    function renderPairItem(slot, item) {
+      const root = $(`#q-pair-item-${slot}`);
+      root.querySelector('.q-pair-prompt').textContent = item.prompt;
+      root.querySelector('.q-pair-title').textContent = item.title;
+      root.querySelector('.q-pair-subtitle').textContent = item.subtitle || '';
+      const iconWrap = root.querySelector('.q-pair-icon-wrap');
+      iconWrap.dataset.kind = item.kind || 'history';
+      const artworkImg = root.querySelector('.q-pair-artwork');
+      if (item.artwork) {
+        artworkImg.src = item.artwork;
         artworkImg.onerror = () => {
           delete iconWrap.dataset.hasArtwork;
         };
@@ -4080,6 +4290,45 @@
         delete iconWrap.dataset.hasArtwork;
         artworkImg.removeAttribute('src');
       }
+    }
+
+    function renderQuestion() {
+      const q = state.questions[state.index];
+      const isSurvival = state.mode === 'survival';
+      const isDiff = state.mode === 'diff';
+      $('#q-counter').textContent = isSurvival ?
+        `Question ${state.index + 1}` :
+        `Question ${state.index + 1} of ${state.questions.length}`;
+      $('#survival-banner').hidden = !isSurvival;
+      updateSurvivalBar();
+
+      $('#q-card-single').hidden = isDiff;
+      $('#q-pair-card').hidden = !isDiff;
+
+      if (isDiff) {
+        renderPairItem('a', q.a);
+        renderPairItem('b', q.b);
+      } else {
+        $('#q-prompt').textContent = q.prompt;
+        $('#q-title').textContent = q.title;
+        $('#q-subtitle').textContent = q.subtitle || '';
+
+        const iconWrap = $('#q-icon-wrap');
+        iconWrap.dataset.kind = q.kind || 'history';
+
+        // Swap the category icon for the actual cover art when iTunes gave us one.
+        const artworkImg = $('#q-artwork');
+        if (q.artwork) {
+          artworkImg.src = q.artwork;
+          artworkImg.onerror = () => {
+            delete iconWrap.dataset.hasArtwork;
+          };
+          iconWrap.dataset.hasArtwork = 'true';
+        } else {
+          delete iconWrap.dataset.hasArtwork;
+          artworkImg.removeAttribute('src');
+        }
+      }
 
       $('#reveal').classList.add('hidden');
       $('#guess-panel').style.display = '';
@@ -4087,8 +4336,24 @@
 
       // reset slider to a neutral starting point each question
       const slider = $('#year-slider');
-      slider.value = 1980;
-      $('#year-value').textContent = '1980';
+      if (isDiff) {
+        const maxDiff = MAX_YEAR - MIN_YEAR;
+        slider.min = '0';
+        slider.max = String(maxDiff);
+        slider.value = '30';
+        $('#year-value').textContent = '30';
+        $('#year-slider-prompt').textContent = 'Years apart:';
+        $('#year-slider-label-min').textContent = '0';
+        $('#year-slider-label-max').textContent = String(maxDiff);
+      } else {
+        slider.min = String(MIN_YEAR);
+        slider.max = String(MAX_YEAR);
+        slider.value = '1980';
+        $('#year-value').textContent = '1980';
+        $('#year-slider-prompt').textContent = 'Your guess:';
+        $('#year-slider-label-min').textContent = String(MIN_YEAR);
+        $('#year-slider-label-max').textContent = String(MAX_YEAR);
+      }
     }
 
     function fireExplosion(cb) {
@@ -4170,23 +4435,42 @@
     }
 
     function submitGuess() {
+      const isDiff = state.mode === 'diff';
       const guess = parseInt($('#year-slider').value, 10);
       const q = state.questions[state.index];
-      const diff = Math.abs(guess - q.year);
+      const actual = isDiff ? Math.abs(q.a.year - q.b.year) : q.year;
+      const diff = Math.abs(guess - actual);
       state.totalOff += diff;
       state.lastGuess = guess;
       state.lastDiff = diff;
-      state.history.push({
+
+      const historyEntry = isDiff ? {
+        title: `${q.a.title} & ${q.b.title}`,
+        subtitle: '',
+        guess,
+        year: actual,
+        diff,
+        isDiff: true,
+        yearA: q.a.year,
+        yearB: q.b.year,
+      } : {
         title: q.title,
         subtitle: q.subtitle || '',
         guess,
         year: q.year,
         diff
-      });
+      };
+      state.history.push(historyEntry);
       updateSurvivalBar();
 
-      $('#reveal-guess').textContent = guess;
-      $('#reveal-year').textContent = q.year;
+      $('#reveal-guess').textContent = isDiff ? `${guess} ${guess === 1 ? 'year' : 'years'}` : guess;
+      if (isDiff) {
+        const lo = Math.min(q.a.year, q.b.year);
+        const hi = Math.max(q.a.year, q.b.year);
+        $('#reveal-year').textContent = `${actual} ${actual === 1 ? 'year' : 'years'} (${lo} → ${hi})`;
+      } else {
+        $('#reveal-year').textContent = q.year;
+      }
 
       // Hide the answer behind a toggle so replaying users can't memorise years by seeing them each time.
       $('#reveal-answer-wrap').hidden = true;
@@ -4194,7 +4478,7 @@
       toggle.hidden = false;
 
       const itunesLink = $('#reveal-itunes-link');
-      if (q.itunesUrl) {
+      if (!isDiff && q.itunesUrl) {
         itunesLink.href = q.itunesUrl;
         itunesLink.hidden = false;
       } else {
@@ -4301,7 +4585,7 @@
         const result = document.createElement('span');
         result.className = 'result';
         const year = document.createElement('strong');
-        year.textContent = h.year;
+        year.textContent = h.isDiff ? `${h.year} yrs` : h.year;
         result.append(year, document.createTextNode(`${h.diff} off`));
         li.append(rank, title, result);
         list.appendChild(li);
@@ -4311,10 +4595,15 @@
     function showEnd() {
       show('#end-screen');
       const isSurvival = state.mode === 'survival';
+      const isDiff = state.mode === 'diff';
       if (isSurvival) {
         $('#end-heading').textContent = '💥 Boom!';
         const q = state.history.length;
         $('#end-total').innerHTML = `You lasted <strong>${q} ${q === 1 ? 'question' : 'questions'}</strong> before hitting 100 years off.`;
+      } else if (isDiff) {
+        $('#end-heading').textContent = 'Game over';
+        const y = state.totalOff;
+        $('#end-total').innerHTML = `You were off by <strong>${y} ${y === 1 ? 'year' : 'years'}</strong> across 10 difference guesses.`;
       } else {
         $('#end-heading').textContent = 'Game over';
         const y = state.totalOff;
@@ -4345,6 +4634,8 @@
           // Pre-build a buffer of ~30 questions; nextQuestion() will top up in the background if needed.
           const batches = await Promise.all([buildGame(10), buildGame(10), buildGame(10)]);
           qs = dedupeQuestions(batches.flat());
+        } else if (mode === 'diff') {
+          qs = await buildDiffGame(10);
         } else {
           qs = await buildGame(10);
         }
@@ -4370,6 +4661,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       $('#start-btn').addEventListener('click', () => startGame('classic'));
       $('#start-survival-btn').addEventListener('click', () => startGame('survival'));
+      $('#start-diff-btn').addEventListener('click', () => startGame('diff'));
       $('#replay-btn').addEventListener('click', () => show('#start-screen'));
       $('#submit-btn').addEventListener('click', submitGuess);
       $('#reveal-toggle').addEventListener('click', revealAnswer);
